@@ -39,7 +39,9 @@ int main(){
 
     float moveSpeed = 10000.0f;
 
-    while(window.isOpen())
+    cout << "Press a key to continue" << endl;
+
+    while(window.isOpen()) // beginning of game loop
     {
         sf::Event Event;
 
@@ -49,12 +51,17 @@ int main(){
                 window.close();
         }
 
-        time = clock.getElapsedTime(); // count the time elapsed since the last frame rendered
+//        time = clock.getElapsedTime(); // time elapsed since first frame
+        time = clock.restart(); // time elapsed since the last frame rendered
         cout << time.asSeconds() << endl;
-        clock.restart();
+
+        if(window.waitEvent(Event)) // only iterates game loop after an event is processed
+        {
+            cout << "Event activated" << endl;
+        }
 
         window.display();
     }
 
-        return 0;
+    return 0;
 }
