@@ -1,36 +1,56 @@
 //
 // Created by William Webster on 15/11/2017.
-// SFML test
 //
+#include<SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
+#include <iostream>
+#include "ScreenManager.h"
 
-#include <SFML/Graphics.hpp>
+using namespace std;
+
+int main(){
+//    cout << "Hello, World!" << endl;
+//
+//    ScreenManager::getInstance().setText("Testing");
+//    ScreenManager::getInstance().drawText();
+//
+//    cin.get(); // waits for input so not to immediately return & end
+//    return 0;
 
 
-int main() {
 
-    sf::RenderWindow window(sf::VideoMode(640,480,32),"Hello SFML");
+//    sf::Vector2i screenDimension(800,600);
 
-    sf::Font font;
-    font.loadFromFile("OpenSans-Bold.ttf");
-
-    sf::Text text("Hello World",font,11);
-    text.setCharacterSize(32);
-    text.setPosition(window.getSize().x/2 - text.getGlobalBounds().width/2,
-                     window.getSize().y/2 - text.getGlobalBounds().height/2);
+    sf::RenderWindow window;
+//    sf::window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "My first SFML Game");
+    window.create(sf::VideoMode(800, 600), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close);
 
 
-    while(window.isOpen()){
+    sf::Clock clock;
+    sf::SoundBuffer soundBuffer;
+    sf::Sound sound;
 
-        sf::Event event;
-        while(window.pollEvent(event)) {
-            if(event.type == sf::Event::Closed){
+    sf::Vector2u size(1080, 920);
+    cout << size.x << " " << size.y << endl; // debug
+
+    window.setSize(size);
+    window.setTitle("New Title");
+    window.setPosition(sf::Vector2i(200, 100));
+
+    float moveSpeed = 10000.0f;
+
+    while(window.isOpen())
+    {
+        sf::Event Event;
+
+        while(window.pollEvent(Event))
+        {
+            if(Event.type == sf::Event::Closed)
                 window.close();
-            }
-
-            window.clear(sf::Color::Black);
-            window.draw(text);
-            window.display();
         }
+
+        window.display();
     }
-    return 0;
+
+        return 0;
 }
