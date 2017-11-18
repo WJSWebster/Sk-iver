@@ -3,8 +3,8 @@
 //
 #include<SFML/Graphics.hpp>
 #include<SFML/Audio.hpp>
+
 #include <iostream>
-#include "ScreenManager.h"
 
 using namespace std;
 
@@ -18,20 +18,20 @@ int main(){
 //    return 0;
 
 
-
-//    sf::Vector2i screenDimension(800,600);
+    sf::Vector2i screenDimension(800,600);
 
     sf::RenderWindow window;
-//    sf::window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "My first SFML Game");
-    window.create(sf::VideoMode(800, 600), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close);
+    window.create(sf::VideoMode(screenDimension.x, screenDimension.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close);
 
 
     sf::Clock clock;
     sf::SoundBuffer soundBuffer;
     sf::Sound sound;
 
+    sf::Time time = sf::seconds(2);
+
     sf::Vector2u size(1080, 920);
-    cout << size.x << " " << size.y << endl; // debug
+//    cout << size.x << " " << size.y << endl; // debug
 
     window.setSize(size);
     window.setTitle("New Title");
@@ -48,6 +48,10 @@ int main(){
             if(Event.type == sf::Event::Closed)
                 window.close();
         }
+
+        time = clock.getElapsedTime(); // count the time elapsed since the last frame rendered
+        cout << time.asSeconds() << endl;
+        clock.restart();
 
         window.display();
     }
