@@ -45,17 +45,19 @@ int main(){
 
         while(window.pollEvent(Event))
         {
-            if(Event.type == sf::Event::Closed)
+            if (Event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
 
 //          time = clock.getElapsedTime(); // time elapsed since first frame
             time = clock.restart(); // time elapsed since the last frame rendered
-    //        cout << time.asSeconds() << endl;
+            //        cout << time.asSeconds() << endl;
 
 
-            if(Event.type == sf::Event::KeyPressed)
+            if (Event.type == sf::Event::KeyPressed)
             {
-                if(Event.key.code == sf::Keyboard::Return)
+                if (Event.key.code == sf::Keyboard::Return)
                 {
                     display += message[index];
                     index++;
@@ -65,31 +67,45 @@ int main(){
                 }
 
                 // should be pushed out to it's own controller function or something
-                if((Event.key.code == sf::Keyboard::W) || (Event.key.code == sf::Keyboard::Up))
-                {
-                    cout << "player go up";
-                    // increment Diver.y
-                }
-                else if((Event.key.code == sf::Keyboard::S) || (Event.key.code == sf::Keyboard::Down))
-                {
-                    cout << "player go down";
-                    // decrement Diver.y
-                }
+                switch (Event.type) {
+                    case sf::Event::MouseMoved:
+                        cout << "X: " << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
+                        break;
 
-                if((Event.key.code == sf::Keyboard::D) || (Event.key.code == sf::Keyboard::Right))
-                {
-                    cout << "player go right";
-                    // increment Diver.x
-                }
-                else if((Event.key.code == sf::Keyboard::A) || (Event.key.code == sf::Keyboard::Left))
-                {
-                    cout << "player go left";
-                    // increment Diver.x
+                    case sf::Event::MouseButtonPressed:
+                        if(Event.mouseButton.button == sf::Mouse::Left)
+                        {
+                            cout << Event.mouseButton.x << Event.mouseButton.y;
+                        }
+                        break;
+
+                    case sf::Event::KeyPressed:
+                        if (Event.key.code == sf::Keyboard::W or Event.key.code == sf::Keyboard::Up) {
+                            cout << "player go up" << endl;
+                            // increment Diver.y
+                        } else if (Event.key.code == sf::Keyboard::S or Event.key.code == sf::Keyboard::Down) {
+                            cout << "player go down" << endl;
+                            // decrement Diver.y
+                        }
+
+                        if (Event.key.code == sf::Keyboard::D or Event.key.code == sf::Keyboard::Right) {
+                            cout << "player go right" << endl;
+                            // increment Diver.x
+                        } else if (Event.key.code == sf::Keyboard::A or Event.key.code == sf::Keyboard::Left) {
+                            cout << "player go left" << endl;
+                            // increment Diver.x
+                        }
+
+                        break;
+
+                    case sf::Event::Closed:
+                        window.close();
+                        break;
                 }
             }
 
-        }
 
+        }
         window.display();
     }
 
