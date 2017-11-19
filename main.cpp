@@ -5,17 +5,11 @@
 #include<SFML/Audio.hpp>
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 int main(){
-//    cout << "Hello, World!" << endl;
-//
-//    ScreenManager::getInstance().setText("Testing");
-//    ScreenManager::getInstance().drawText();
-//
-//    cin.get(); // waits for input so not to immediately return & end
-//    return 0;
 
 
     sf::Vector2i screenDimension(800,600);
@@ -39,7 +33,11 @@ int main(){
 
     float moveSpeed = 10000.0f;
 
-    cout << "Press a key to continue" << endl;
+    string message = "Hello World!";
+    string display = "";
+    int index = 0;
+
+//    window.setKeyRepeatEnabled(false);
 
     while(window.isOpen()) // beginning of game loop
     {
@@ -49,15 +47,47 @@ int main(){
         {
             if(Event.type == sf::Event::Closed)
                 window.close();
-        }
 
-//        time = clock.getElapsedTime(); // time elapsed since first frame
-        time = clock.restart(); // time elapsed since the last frame rendered
-        cout << time.asSeconds() << endl;
+//          time = clock.getElapsedTime(); // time elapsed since first frame
+            time = clock.restart(); // time elapsed since the last frame rendered
+    //        cout << time.asSeconds() << endl;
 
-        if(window.waitEvent(Event)) // only iterates game loop after an event is processed
-        {
-            cout << "Event activated" << endl;
+
+            if(Event.type == sf::Event::KeyPressed)
+            {
+                if(Event.key.code == sf::Keyboard::Return)
+                {
+                    display += message[index];
+                    index++;
+                    system("clear"); // or system("cls") on windows
+
+                    cout << display;
+                }
+
+                // should be pushed out to it's own controller function or something
+                if((Event.key.code == sf::Keyboard::W) || (Event.key.code == sf::Keyboard::Up))
+                {
+                    cout << "player go up";
+                    // increment Diver.y
+                }
+                else if((Event.key.code == sf::Keyboard::S) || (Event.key.code == sf::Keyboard::Down))
+                {
+                    cout << "player go down";
+                    // decrement Diver.y
+                }
+
+                if((Event.key.code == sf::Keyboard::D) || (Event.key.code == sf::Keyboard::Right))
+                {
+                    cout << "player go right";
+                    // increment Diver.x
+                }
+                else if((Event.key.code == sf::Keyboard::A) || (Event.key.code == sf::Keyboard::Left))
+                {
+                    cout << "player go left";
+                    // increment Diver.x
+                }
+            }
+
         }
 
         window.display();
