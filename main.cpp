@@ -16,7 +16,7 @@ int main(){
     sf::Vector2i screenDimension(800,600);
 
     sf::RenderWindow window;
-    window.create(sf::VideoMode(screenDimension.x, screenDimension.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close);
+    window.create(sf::VideoMode(screenDimension.x, screenDimension.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close); // | sf::Style::Resize);
 
     sf::Clock clock;
     sf::SoundBuffer soundBuffer;
@@ -55,90 +55,87 @@ int main(){
             }
 
 //          time = clock.getElapsedTime(); // time elapsed since first frame
-//            time = clock.restart(); // time elapsed since the last frame rendered
-            //        cout << time.asSeconds() << endl;
+//          time = clock.restart(); // time elapsed since the last frame rendere
+//          cout << time.asSeconds() << endl;
 
-
-            if (Event.type == sf::Event::KeyPressed)
+            // should be pushed out to it's own controller function or something
+            switch (Event.type)
             {
-                if (Event.key.code == sf::Keyboard::Return)
-                {
-                    display += message[index];
-                    index++;
-                    system("clear"); // or system("cls") on windows
+                case sf::Event::MouseMoved:
+                    cout << "X: " << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
+                    break;
 
-                    cout << display;
+                case sf::Event::MouseButtonPressed:
+                    if(Event.mouseButton.button == sf::Mouse::Left)
+                    {
+                        cout << Event.mouseButton.x << Event.mouseButton.y;
+                    }
+                    break;
+
+                case sf::Event::KeyPressed: {
+                    // vertical movement
+                    // can also be written: if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
+                    if (Event.key.code == sf::Keyboard::W or Event.key.code == sf::Keyboard::Up) {
+                        cout << "player go up" << endl;
+                        // decrement Diver.y:
+                        velocity.y -= acceleration; // apply forward acceleration
+                    } else if (Event.key.code == sf::Keyboard::S or Event.key.code == sf::Keyboard::Down) {
+                        cout << "player go down" << endl;
+                        // increment Diver.y:
+                        velocity.y += acceleration; // apply forward acceleration
+                    } else
+                        velocity.y *= deceleration;
+
+                    // horizontal movement
+                    if (Event.key.code == sf::Keyboard::D or Event.key.code == sf::Keyboard::Right) {
+                        cout << "player go right" << endl;
+                        // increment Diver.x:
+                        velocity.x += acceleration; // apply rightward acceleration
+                    } else if (Event.key.code == sf::Keyboard::A or Event.key.code == sf::Keyboard::Left) {
+                        cout << "player go left" << endl;
+                        // increment Diver.x
+                        velocity.x -= acceleration; // apply leftward acceleration
+                        // velocity.x -= acceleration * deltaTime.restart().asSeconds();
+                    } else {
+                        velocity.x *= deceleration; // else, not moving horizontally, so apply deceleration (why '*='?)
+                    }
+
+                    // now that we've updated our velocity, make sure we're not going beyond max speed:
+                    /*if(velocity.x < -maxSpeed)      velocity.x = -maxSpeed;
+                    else if(velocity.x > maxSpeed)  velocity.x = maxSpeed;
+                    if(velocity.y < -maxSpeed)      velocity.y = -maxSpeed;
+                    else if(velocity.y > maxSpeed)  velocity.y = maxSpeed;*/
+                    float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
+
+                    if (actualSpeed > maxSpeed) // are we going too fast?
+                    {
+                        velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
+                    }
+
+                    // now we have our final velocity, update player's position
+                    position += velocity; // update class
+                    // extra function call to catch player going off screen
+                    //sprite.setPosition(position); // draw class
+
+                    break;
                 }
 
-                // should be pushed out to it's own controller function or something
-                switch (Event.type)
-                {
-                    case sf::Event::MouseMoved:
-                        cout << "X: " << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
-                        break;
+                case sf::Event::GainedFocus:
+                    cout << "Window Active" << endl;
+                    // replay audio
+                    break;
 
-                    case sf::Event::MouseButtonPressed:
-                        if(Event.mouseButton.button == sf::Mouse::Left)
-                        {
-                            cout << Event.mouseButton.x << Event.mouseButton.y;
-                        }
-                        break;
+                case sf::Event::LostFocus:
+                    cout << "Window NOT Active" << endl;
+                    // pause the game & audio
+//                        break;
+                case sf::Event::Resized:
+                    cout << "New width: " << Event.size.width << ", new height: " << Event.size.height << endl;
+                    break;
 
-                    case sf::Event::KeyPressed:
-                        // vertical movement
-                        // can also be written: if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
-                        if (Event.key.code == sf::Keyboard::W or Event.key.code == sf::Keyboard::Up)
-                        {
-                            cout << "player go up" << endl;
-                            // decrement Diver.y:
-                            velocity.y -= acceleration; // apply forward acceleration
-                        } else if (Event.key.code == sf::Keyboard::S or Event.key.code == sf::Keyboard::Down)
-                        {
-                            cout << "player go down" << endl;
-                            // increment Diver.y:
-                            velocity.y += acceleration; // apply forward acceleration
-                        } else
-                            velocity.y *= deceleration;
-
-                        // horizontal movement
-                        if (Event.key.code == sf::Keyboard::D or Event.key.code == sf::Keyboard::Right)
-                        {
-                            cout << "player go right" << endl;
-                            // increment Diver.x:
-                            velocity.x += acceleration; // apply rightward acceleration
-                        } else if (Event.key.code == sf::Keyboard::A or Event.key.code == sf::Keyboard::Left)
-                        {
-                            cout << "player go left" << endl;
-                            // increment Diver.x
-                            velocity.x -= acceleration; // apply leftward acceleration
-                            // velocity.x -= acceleration * deltaTime.restart().asSeconds();
-                        } else
-                            velocity.x *= deceleration; // else, not moving horizontally, so apply deceleration (why '*='?)
-
-
-                        // now that we've updated our velocity, make sure we're not going beyond max speed:
-                        /*if(velocity.x < -maxSpeed)      velocity.x = -maxSpeed;
-                        else if(velocity.x > maxSpeed)  velocity.x = maxSpeed;
-                        if(velocity.y < -maxSpeed)      velocity.y = -maxSpeed;
-                        else if(velocity.y > maxSpeed)  velocity.y = maxSpeed;*/
-                        float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
-
-                        if (actualSpeed > maxSpeed) // are we going too fast?
-                        {
-                            velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
-                        }
-
-                        // now we have our final velocity, update player's position
-                        position += velocity; // update class
-                        // extra function call to catch player going off screen
-                        //sprite.setPosition(position); // draw class
-
-                        break;
-
-                    case sf::Event::Closed:
-                        window.close();
-                        break;
-                }
+                default:
+                    cout << endl;
+                    break;
             }
 
 
