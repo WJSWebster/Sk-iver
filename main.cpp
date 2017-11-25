@@ -10,9 +10,8 @@
 
 using namespace std;
 
-int main(){
-
-
+int main()
+{
     sf::Vector2i screenDimension(800,600);
 
     sf::RenderWindow window;
@@ -23,18 +22,22 @@ int main(){
     sf::Sound sound;
 
     sf::Vector2u size(1080, 920);
-//    cout << size.x << " " << size.y << endl; // debug
     window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
     window.setPosition(sf::Vector2i(200, 100));
-    window.setFramerateLimit(60);
     window.setKeyRepeatEnabled(false); // TODO investigate
+    window.setVerticalSyncEnabled(1);
+    window.setFramerateLimit(60);
 
     // loading the player sprite
     sf::Texture playerTexture;
-    if(!playerTexture.loadFromFile("placeholder_spritesheet.png", sf::IntRect(256, 0, 256, 256))){
+    if(!playerTexture.loadFromFile("placeholder_spritesheet.png")){
         cout << "ERROR: Could not load player image." << endl;
     }
+
+
+    enum spriteDirection { Down, Left, Right, Up };
+    sf::Vector2i source(0, Down);
 
     sf::Sprite playerImage;
     playerImage.setTexture(playerTexture);
@@ -43,8 +46,8 @@ int main(){
     sf::Vector2f position; // player's position
     sf::Vector2f velocity; // player's velocity
     float maxSpeed = 4.0f; // player's maximum speed
-    float acceleration = 0.1f; // player's movement acceleration // sk-iver's take a while to get moving
-    float deceleration = 1.5f; // player's movement deceleration // sk-iver's stop moving a lot quicker
+    float acceleration = 1.5f; // player's movement acceleration // sk-iver's take a while to get moving
+    float deceleration = 0.1f; // player's movement deceleration // sk-iver's stop moving a lot quicker
 
     while(window.isOpen()) // beginning of game loop
     {
@@ -52,11 +55,6 @@ int main(){
 
         while(window.pollEvent(Event))
         {
-            if (Event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-
 //          time = clock.getElapsedTime(); // time elapsed since first frame
 //          time = clock.restart(); // time elapsed since the last frame rendere
 //          cout << time.asSeconds() << endl;
@@ -80,10 +78,18 @@ int main(){
                     // can also be written: if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
                     if (Event.key.code == sf::Keyboard::W or Event.key.code == sf::Keyboard::Up) {
                         cout << "player go up" << endl;
+
+                        source.y = Up;
+
                         // decrement Diver.y:
                         velocity.y -= acceleration; // apply forward acceleration
+
                     } else if (Event.key.code == sf::Keyboard::S or Event.key.code == sf::Keyboard::Down) {
                         cout << "player go down" << endl;
+
+                        source.y = Down;
+
+
                         // increment Diver.y:
                         velocity.y += acceleration; // apply forward acceleration
                     } else
@@ -92,10 +98,18 @@ int main(){
                     // horizontal movement
                     if (Event.key.code == sf::Keyboard::D or Event.key.code == sf::Keyboard::Right) {
                         cout << "player go right" << endl;
+
+
+                        source.y = Right;
+
                         // increment Diver.x:
                         velocity.x += acceleration; // apply rightward acceleration
                     } else if (Event.key.code == sf::Keyboard::A or Event.key.code == sf::Keyboard::Left) {
                         cout << "player go left" << endl;
+
+
+                        source.y = Left;
+
                         // increment Diver.x
                         velocity.x -= acceleration; // apply leftward acceleration
                         // velocity.x -= acceleration * deltaTime.restart().asSeconds();
@@ -118,7 +132,7 @@ int main(){
                     // now we have our final velocity, update player's position
                     position += velocity; // update class
                     // extra function call to catch player going off screen
-                    //sprite.setPosition(position); // draw class
+                    //playerImage.setPosition(position); // draw class
 
                     break;
                 }
@@ -137,16 +151,30 @@ int main(){
                     cout << "New width: " << Event.size.width << ", new height: " << Event.size.height << endl;
                     break;
 
+                case sf::Event::Closed:
+                {
+                    window.close();
+                }
+
                 default:
                     cout << endl;
                     break;
             }
 
         }
+
+        source.x++;
+        if(source.x * 256 >= playerTexture.getSize().x)
+            source.x = 0;
+
+//        playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
+        playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
         playerImage.setPosition(position);
 
         window.draw(playerImage);
         window.display();
+
+        window.clear();
     }
 
     return 0;
