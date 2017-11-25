@@ -27,14 +27,17 @@ int main(){
     window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
     window.setPosition(sf::Vector2i(200, 100));
-
-    string message = "Hello World!";
-    string display = "";
-    int index = 0;
-
     window.setFramerateLimit(60);
+    window.setKeyRepeatEnabled(false); // TODO investigate
 
-//    window.setKeyRepeatEnabled(false);
+    // loading the player sprite
+    sf::Texture playerTexture;
+    if(!playerTexture.loadFromFile("placeholder_spritesheet.png", sf::IntRect(256, 0, 256, 256))){
+        cout << "ERROR: Could not load player image." << endl;
+    }
+
+    sf::Sprite playerImage;
+    playerImage.setTexture(playerTexture);
 
     //Player attributes - to move over to player object once created
     sf::Vector2f position; // player's position
@@ -62,13 +65,13 @@ int main(){
             switch (Event.type)
             {
                 case sf::Event::MouseMoved:
-                    cout << "X: " << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
+//                    cout  << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
                     break;
 
                 case sf::Event::MouseButtonPressed:
-                    if(Event.mouseButton.button == sf::Mouse::Left)
+                    if(Event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
                     {
-                        cout << Event.mouseButton.x << Event.mouseButton.y;
+                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
                     }
                     break;
 
@@ -128,7 +131,8 @@ int main(){
                 case sf::Event::LostFocus:
                     cout << "Window NOT Active" << endl;
                     // pause the game & audio
-//                        break;
+                    break;
+
                 case sf::Event::Resized:
                     cout << "New width: " << Event.size.width << ", new height: " << Event.size.height << endl;
                     break;
@@ -138,8 +142,10 @@ int main(){
                     break;
             }
 
-
         }
+        playerImage.setPosition(position);
+
+        window.draw(playerImage);
         window.display();
     }
 
