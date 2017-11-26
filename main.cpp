@@ -21,8 +21,6 @@ int main()
     sf::SoundBuffer soundBuffer; // TODO currently not used
     sf::Sound sound;             // TODO currently not used
 
-    bool updatedFrame = true;
-
     sf::Vector2u size(1080, 920);
     window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
@@ -73,11 +71,7 @@ int main()
                 case sf::Event::MouseButtonPressed:
                     if(Event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
                         // Debug:
-//                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
-                        // even more Debug:
-                        updatedFrame = true;
-                    else if (Event.mouseButton.button == sf::Mouse::Right)
-                        updatedFrame = false; // prevents walking animation
+                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
                     break;
 
                 case sf::Event::GainedFocus:
@@ -151,13 +145,8 @@ int main()
         position += velocity; // TODO update class
         // TODO extra function call to catch player going off screen
 
-        // debug if statement that disabled walking animation if right click
-        if (updatedFrame)
-            // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
-            frameCounter += frameSpeed * clock.restart().asSeconds();
-        else
-            frameCounter = 0;
-
+        // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
+        frameCounter += frameSpeed * clock.restart().asSeconds();
         // if 500 frames have passed, cycle through to next animation
         if (frameCounter >= switchFrame){
             // animation of sprite through SS images, based on which direction facing
