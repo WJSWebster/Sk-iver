@@ -18,8 +18,10 @@ int main()
     window.create(sf::VideoMode(screenDimension.x, screenDimension.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close); // | sf::Style::Resize);
 
     sf::Clock clock;
-    sf::SoundBuffer soundBuffer;
-    sf::Sound sound;
+    sf::SoundBuffer soundBuffer; // TODO currently not used
+    sf::Sound sound;             // TODO currently not used
+
+    bool updatedFrame = true;
 
     sf::Vector2u size(1080, 920);
     window.setSize(size);
@@ -47,8 +49,8 @@ int main()
     sf::Vector2f position; // player's position
     sf::Vector2f velocity; // player's velocity
     float maxSpeed = 4.0f; // player's maximum speed
-    float acceleration = 1.5f; // player's movement acceleration // sk-iver's take a while to get moving
-    float deceleration = 0.1f; // player's movement deceleration // sk-iver's stop moving a lot quicker
+    float acceleration = 0.5f; // player's movement acceleration // sk-iver's take a while to get moving // (previously 1.1f)
+    float deceleration = 0.98f; // player's movement deceleration // sk-iver's stop moving a lot quicker
 
     while(window.isOpen()) // beginning of game loop
     {
@@ -56,11 +58,12 @@ int main()
 
         while(window.pollEvent(Event))
         {
+            // Debug:
 //          time = clock.getElapsedTime(); // time elapsed since first frame
-//          time = clock.restart(); // time elapsed since the last frame rendere
+//          time = clock.restart(); // time elapsed since the last frame rendered
 //          cout << time.asSeconds() << endl;
 
-            // should be pushed out to it's own controller function or something
+            // TODO should be pushed out to it's own controller function or something
             switch (Event.type)
             {
                 case sf::Event::MouseMoved:
@@ -69,19 +72,22 @@ int main()
 
                 case sf::Event::MouseButtonPressed:
                     if(Event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
-                    {
-                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
-                    }
+                        // Debug:
+//                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
+                        // even more Debug:
+                        updatedFrame = true;
+                    else if (Event.mouseButton.button == sf::Mouse::Right)
+                        updatedFrame = false; // prevents walking animation
                     break;
 
                 case sf::Event::GainedFocus:
                     cout << "Window Active" << endl;
-                    // replay audio
+                    // TODO re-play audio etc
                     break;
 
                 case sf::Event::LostFocus:
                     cout << "Window NOT Active" << endl;
-                    // pause the game & audio
+                    // TODO pause the game & audio etc
                     break;
 
                 case sf::Event::Resized:
@@ -136,23 +142,22 @@ int main()
         }
 
         // now that we've updated our velocity, make sure we're not going beyond max speed:
-        /*if(velocity.x < -maxSpeed)      velocity.x = -maxSpeed;
-        else if(velocity.x > maxSpeed)  velocity.x = maxSpeed;
-        if(velocity.y < -maxSpeed)      velocity.y = -maxSpeed;
-        else if(velocity.y > maxSpeed)  velocity.y = maxSpeed;*/
         float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
 
         if (actualSpeed > maxSpeed) // are we going too fast?
             velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
 
         // now we have our final velocity, update player's position
-        position += velocity; // update class
-        // extra function call to catch player going off screen
+        position += velocity; // TODO update class
+        // TODO extra function call to catch player going off screen
 
-        cout << clock.getElapsedTime().asSeconds() << endl;
+        // debug if statement that disabled walking animation if right click
+        if (updatedFrame)
+            // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
+            frameCounter += frameSpeed * clock.restart().asSeconds();
+        else
+            frameCounter = 0;
 
-        // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
-        frameCounter += frameSpeed * clock.restart().asSeconds();
         // if 500 frames have passed, cycle through to next animation
         if (frameCounter >= switchFrame){
             // animation of sprite through SS images, based on which direction facing
