@@ -29,18 +29,19 @@ int main()
     window.setVerticalSyncEnabled(1);
     window.setFramerateLimit(60);
 
+    float frameCounter = 0, switchFrame = 100, frameSpeed = 500;
+
     // loading the player sprite
     sf::Texture playerTexture;
     if(!playerTexture.loadFromFile("placeholder_spritesheet.png")){
         cout << "ERROR: Could not load player image." << endl;
     }
 
+    sf::Sprite playerImage;
+    playerImage.setTexture(playerTexture);
 
     enum spriteDirection { Down, Left, Right, Up };
     sf::Vector2i source(0, Down);
-
-    sf::Sprite playerImage;
-    playerImage.setTexture(playerTexture);
 
     //Player attributes - to move over to player object once created
     sf::Vector2f position; // player's position
@@ -73,70 +74,6 @@ int main()
                     }
                     break;
 
-                case sf::Event::KeyPressed: {
-                    // vertical movement
-                    // can also be written: if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)
-                    if (Event.key.code == sf::Keyboard::W or Event.key.code == sf::Keyboard::Up) {
-                        cout << "player go up" << endl;
-
-                        source.y = Up;
-
-                        // decrement Diver.y:
-                        velocity.y -= acceleration; // apply forward acceleration
-
-                    } else if (Event.key.code == sf::Keyboard::S or Event.key.code == sf::Keyboard::Down) {
-                        cout << "player go down" << endl;
-
-                        source.y = Down;
-
-
-                        // increment Diver.y:
-                        velocity.y += acceleration; // apply forward acceleration
-                    } else
-                        velocity.y *= deceleration;
-
-                    // horizontal movement
-                    if (Event.key.code == sf::Keyboard::D or Event.key.code == sf::Keyboard::Right) {
-                        cout << "player go right" << endl;
-
-
-                        source.y = Right;
-
-                        // increment Diver.x:
-                        velocity.x += acceleration; // apply rightward acceleration
-                    } else if (Event.key.code == sf::Keyboard::A or Event.key.code == sf::Keyboard::Left) {
-                        cout << "player go left" << endl;
-
-
-                        source.y = Left;
-
-                        // increment Diver.x
-                        velocity.x -= acceleration; // apply leftward acceleration
-                        // velocity.x -= acceleration * deltaTime.restart().asSeconds();
-                    } else {
-                        velocity.x *= deceleration; // else, not moving horizontally, so apply deceleration (why '*='?)
-                    }
-
-                    // now that we've updated our velocity, make sure we're not going beyond max speed:
-                    /*if(velocity.x < -maxSpeed)      velocity.x = -maxSpeed;
-                    else if(velocity.x > maxSpeed)  velocity.x = maxSpeed;
-                    if(velocity.y < -maxSpeed)      velocity.y = -maxSpeed;
-                    else if(velocity.y > maxSpeed)  velocity.y = maxSpeed;*/
-                    float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
-
-                    if (actualSpeed > maxSpeed) // are we going too fast?
-                    {
-                        velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
-                    }
-
-                    // now we have our final velocity, update player's position
-                    position += velocity; // update class
-                    // extra function call to catch player going off screen
-                    //playerImage.setPosition(position); // draw class
-
-                    break;
-                }
-
                 case sf::Event::GainedFocus:
                     cout << "Window Active" << endl;
                     // replay audio
@@ -152,9 +89,8 @@ int main()
                     break;
 
                 case sf::Event::Closed:
-                {
                     window.close();
-                }
+                    break;
 
                 default:
                     cout << endl;
@@ -163,11 +99,70 @@ int main()
 
         }
 
-        source.x++;
-        if(source.x * 256 >= playerTexture.getSize().x)
-            source.x = 0;
 
-//        playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
+        // vertical movement
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+//            cout << "player go up" << endl;
+            source.y = Up;
+
+            // decrement Diver.y:
+            velocity.y -= acceleration; // apply forward acceleration
+
+        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+//            cout << "player go down" << endl;
+            source.y = Down;
+
+            // increment Diver.y:
+            velocity.y += acceleration; // apply backward acceleration
+        } else
+            velocity.y *= deceleration;
+
+        // horizontal movement
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) or sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+//            cout << "player go right" << endl;
+            source.y = Right;
+
+            // increment Diver.x:
+            velocity.x += acceleration; // apply rightward acceleration
+        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) or sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+//            cout << "player go left" << endl;
+            source.y = Left;
+
+            // increment Diver.x
+            velocity.x -= acceleration; // apply leftward acceleration
+            // velocity.x -= acceleration * deltaTime.restart().asSeconds();
+        } else {
+            velocity.x *= deceleration; // else, not moving horizontally, so apply deceleration (why '*='?)
+        }
+
+        // now that we've updated our velocity, make sure we're not going beyond max speed:
+        /*if(velocity.x < -maxSpeed)      velocity.x = -maxSpeed;
+        else if(velocity.x > maxSpeed)  velocity.x = maxSpeed;
+        if(velocity.y < -maxSpeed)      velocity.y = -maxSpeed;
+        else if(velocity.y > maxSpeed)  velocity.y = maxSpeed;*/
+        float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
+
+        if (actualSpeed > maxSpeed) // are we going too fast?
+            velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
+
+        // now we have our final velocity, update player's position
+        position += velocity; // update class
+        // extra function call to catch player going off screen
+
+        cout << clock.getElapsedTime().asSeconds() << endl;
+
+        // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
+        frameCounter += frameSpeed * clock.restart().asSeconds();
+        // if 500 frames have passed, cycle through to next animation
+        if (frameCounter >= switchFrame){
+            // animation of sprite through SS images, based on which direction facing
+            source.x++;
+            if(source.x * 256 >= playerTexture.getSize().x)
+                source.x = 0;
+
+            frameCounter = 0;
+        }
+
         playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
         playerImage.setPosition(position);
 
