@@ -50,6 +50,22 @@ int main()
     float acceleration = 0.5f; // player's movement acceleration // sk-iver's take a while to get moving // (previously 1.1f)
     float deceleration = 0.98f; // player's movement deceleration // sk-iver's stop moving a lot quicker
 
+    sf::RectangleShape rect(sf::Vector2f(10,10));
+    rect.setFillColor(sf::Color::Magenta);
+    rect.setOutlineThickness(2.0);
+    rect.setOutlineColor(sf::Color::Blue);
+    rect.setPosition(100, 100);
+    rect.setTexture(&playerTexture);
+    rect.setSize(sf::Vector2f(800,800));
+
+    sf::CircleShape circ(200, 16);
+
+    sf::ConvexShape conv(3);
+    conv.setPoint(0, sf::Vector2f(10, 10));
+    conv.setPoint(1, sf::Vector2f(15, 15));
+    conv.setPoint(2, sf::Vector2f(20, 10));
+    conv.setOutlineColor(sf::Color::Red);
+
     while(window.isOpen()) // beginning of game loop
     {
         sf::Event Event;
@@ -102,33 +118,25 @@ int main()
 
         // vertical movement
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-//            cout << "player go up" << endl;
             source.y = Up;
 
-            // decrement Diver.y:
-            velocity.y -= acceleration; // apply forward acceleration
+            velocity.y -= acceleration; // apply forward acceleration by decrementing y velocity
 
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-//            cout << "player go down" << endl;
             source.y = Down;
 
-            // increment Diver.y:
-            velocity.y += acceleration; // apply backward acceleration
+            velocity.y += acceleration; // apply backward acceleration by incrementing y velocity
         } else
-            velocity.y *= deceleration;
+            velocity.y *= deceleration; // decelerate
 
         // horizontal movement
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) or sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-//            cout << "player go right" << endl;
             source.y = Right;
 
-            // increment Diver.x:
             velocity.x += acceleration; // apply rightward acceleration
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) or sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-//            cout << "player go left" << endl;
             source.y = Left;
 
-            // increment Diver.x
             velocity.x -= acceleration; // apply leftward acceleration
             // velocity.x -= acceleration * deltaTime.restart().asSeconds();
         } else {
@@ -160,6 +168,9 @@ int main()
         playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
         playerImage.setPosition(position);
 
+//        window.draw(circ);
+//        window.draw(rect);
+//        window.draw(conv);
         window.draw(playerImage);
         window.display();
 
