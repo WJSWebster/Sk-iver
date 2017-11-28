@@ -50,21 +50,7 @@ int main()
     float acceleration = 0.5f; // player's movement acceleration // sk-iver's take a while to get moving // (previously 1.1f)
     float deceleration = 0.98f; // player's movement deceleration // sk-iver's stop moving a lot quicker
 
-    sf::RectangleShape rect(sf::Vector2f(10,10));
-    rect.setFillColor(sf::Color::Magenta);
-    rect.setOutlineThickness(2.0);
-    rect.setOutlineColor(sf::Color::Blue);
-    rect.setPosition(100, 100);
-    rect.setTexture(&playerTexture);
-    rect.setSize(sf::Vector2f(800,800));
-
-    sf::CircleShape circ(200, 16);
-
-    sf::ConvexShape conv(3);
-    conv.setPoint(0, sf::Vector2f(10, 10));
-    conv.setPoint(1, sf::Vector2f(15, 15));
-    conv.setPoint(2, sf::Vector2f(20, 10));
-    conv.setOutlineColor(sf::Color::Red);
+    sf::CircleShape circ(200, 16); // TODO move into constructor for ring's own class
 
     while(window.isOpen()) // beginning of game loop
     {
@@ -168,9 +154,7 @@ int main()
         playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
         playerImage.setPosition(position);
 
-//        window.draw(circ);
-//        window.draw(rect);
-//        window.draw(conv);
+        window.draw(circ);
         window.draw(playerImage);
         window.display();
 
