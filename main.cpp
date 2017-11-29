@@ -7,19 +7,24 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
 int main()
 {
-    sf::Vector2i screenDimension(800,600);
+    sf::Vector2i screenDimensions(800, 600);
+    sf::Vector2i blockDimensions(10, 10);
 
     sf::RenderWindow window;
-    window.create(sf::VideoMode(screenDimension.x, screenDimension.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close); // | sf::Style::Resize);
+    window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close); // | sf::Style::Resize);
 
     sf::Clock clock;
     sf::SoundBuffer soundBuffer; // TODO currently not used
     sf::Sound sound;             // TODO currently not used
+
+//    should just re-assign screenDimension and use here
 
     sf::Vector2u size(1080, 920);
     window.setSize(size);
@@ -28,6 +33,8 @@ int main()
     window.setKeyRepeatEnabled(false); // TODO investigate
     window.setVerticalSyncEnabled(1);
     window.setFramerateLimit(60);
+
+    srand(time(0)); // TODO investigate - is this generating a random seed based on time?
 
     float frameCounter = 0, switchFrame = 100, frameSpeed = 500;
 
@@ -50,7 +57,7 @@ int main()
     float acceleration = 0.5f; // player's movement acceleration // sk-iver's take a while to get moving // (previously 1.1f)
     float deceleration = 0.98f; // player's movement deceleration // sk-iver's stop moving a lot quicker
 
-    sf::CircleShape circ(200, 16); // TODO move into constructor for ring's own class
+    sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
 
     while(window.isOpen()) // beginning of game loop
     {
@@ -100,7 +107,6 @@ int main()
             }
 
         }
-
 
         // vertical movement
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
@@ -154,7 +160,31 @@ int main()
         playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
         playerImage.setPosition(position);
 
-        window.draw(circ);
+        // random noise example:
+        for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
+        {
+            for(int j = 0; j < screenDimensions.y / blockDimensions.y; j++)
+            {
+                sf::VertexArray vertexArray(sf::PrimitiveType::Quads, 4);
+                vertexArray[0].position = sf::Vector2f(i * blockDimensions.x, j * blockDimensions.y);
+                vertexArray[1].position = sf::Vector2f(i * blockDimensions.x + blockDimensions.x, j * blockDimensions.y);
+                vertexArray[2].position = sf::Vector2f(i * blockDimensions.x + blockDimensions.x,
+                                                       j * blockDimensions.y + blockDimensions.y);
+                vertexArray[3].position = sf::Vector2f(i * blockDimensions.x, j * blockDimensions.y + blockDimensions.y);
+
+                for (int k = 0; k < 4; k++){
+                    int red = rand() % 255;
+                    int green = rand() % 255;
+                    int blue = rand() % 255;
+
+                    vertexArray[k].color = sf::Color(red, green, blue);
+                }
+
+                window.draw(vertexArray);
+            }
+        }
+
+        window.draw(circle);
         window.draw(playerImage);
         window.display();
 
