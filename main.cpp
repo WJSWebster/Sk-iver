@@ -44,14 +44,13 @@ int main()
     sf::Sprite playerImage;
     playerImage.setTexture(playerTexture);
 
+    // TODO this all needs to be moved into it's own object (& within an init function) for displaying main menu
     sf::Font font;
     if(!font.loadFromFile("Font/Arial_Unicode.ttf"))
         cout << "ERROR: Could not load font file." << endl;
-
 //    basic_string<sf::Uint32> string = {0x53, 0x6B, 0x671D0000, 0x20, 0x1D30, 0x69, 0x76, 0x65, 0x72};
 //    sf::String sentence(string);
 //    sf::String sentence = "Skᵧ ᴰiver";
-
     sf::Text text("Sk-iver", font, 60); // Title
     text.setColor(sf::Color::Magenta); // function deprecated?
     text.setStyle(sf::Text::Bold);
@@ -69,11 +68,17 @@ int main()
 
     sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
 
+    sf::View view;
+    view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
+    view.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+
+    sf::Vector2f viewPosition(0, 0);
+
     while(window.isOpen()) // beginning of game loop
     {
-        sf::Event Event;
+        sf::Event event;
 
-        while(window.pollEvent(Event))
+        while(window.pollEvent(event))
         {
             // Debug:
 //          time = clock.getElapsedTime(); // time elapsed since first frame
@@ -81,16 +86,16 @@ int main()
 //          cout << time.asSeconds() << endl;
 
             // TODO should be pushed out to it's own controller function or something
-            switch (Event.type)
+            switch (event.type)
             {
                 case sf::Event::MouseMoved:
 //                    cout  << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
                     break;
 
                 case sf::Event::MouseButtonPressed:
-                    if(Event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
+                    if(event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
                         // Debug:
-                        cout << "X: " << Event.mouseButton.x << ", Y: " << Event.mouseButton.y;
+                        cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y;
                     break;
 
                 case sf::Event::GainedFocus:
@@ -105,7 +110,7 @@ int main()
 
                 case sf::Event::Resized:
 //                    window.setView(sf::View(sf::FloatRect(0, 0, Event.size.width, Event.size.height))); // letterboxes to keep same original resolution
-                    cout << "New width: " << Event.size.width << ", new height: " << Event.size.height << endl;
+                    cout << "New width: " << event.size.width << ", new height: " << event.size.height << endl;
                     break;
 
                 case sf::Event::Closed:
@@ -184,9 +189,9 @@ int main()
                 vertexArray[3].position = sf::Vector2f(i * blockDimensions.x, j * blockDimensions.y + blockDimensions.y);
 
                 for (int k = 0; k < 4; k++){
-                    int red = rand() % 255;
-                    int green = rand() % 255;
-                    int blue = rand() % 255;
+                    int red     = rand() % 255;
+                    int green   = rand() % 255;
+                    int blue    = rand() % 255;
 
                     vertexArray[k].color = sf::Color(red, green, blue);
                 }
@@ -195,8 +200,24 @@ int main()
             }
         }
 
+        viewPosition.x = position.x + 10 - (screenDimensions.x / 2);
+        viewPosition.y = position.y + 10 - (screenDimensions.y / 2);
+
+        if(viewPosition.x < 0)
+            viewPosition.x = 0;
+        if(viewPosition.y < 0)
+            viewPosition.y = 0;
+
+        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
+
+        window.setView(view);
+
         window.draw(circle);
         window.draw(playerImage);
+
+        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
+        // and the noise background because that was drawn before the view was reset
+        window.setView(view);
         window.draw(text);
         window.display();
 
