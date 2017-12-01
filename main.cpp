@@ -4,11 +4,25 @@
 #include<SFML/Graphics.hpp>
 #include<SFML/Audio.hpp>
 
+#include "HandleEvents.h"
+#include "Diver.h"
+
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <chrono> // measures time intervals
 
 using namespace std;
+
+// Function Declarations:
+//bool handle_events(sf::RenderWindow& window);
+
+struct game_state {
+    // this contains the state of your game, such as positions and velocities
+};
+
+
+// Function Definitions: // TODO should be below the main method
 
 int main()
 {
@@ -22,27 +36,23 @@ int main()
     sf::SoundBuffer soundBuffer; // TODO currently not used
     sf::Sound sound;             // TODO currently not used
 
-//    should just re-assign screenDimension and use here
+    // initialise 'player' Diver object
+    class Diver player;
+    player.setTexture("placeholder_spritesheet.png");
+    player.setSprite();
 
+//    should just re-assign screenDimension and use here
     sf::Vector2u size(1080, 920);
     window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
     window.setPosition(sf::Vector2i(200, 100));
-//    window.setKeyRepeatEnabled(false); // TODO investigate
+    window.setKeyRepeatEnabled(false); // TODO investigate
     window.setVerticalSyncEnabled(1);
     window.setFramerateLimit(60);
 
     //srand(time(0)); // TODO investigate - is this generating a random seed based on time?
 
     float frameCounter = 0, switchFrame = 100, frameSpeed = 500;
-
-    // loading the player sprite
-    sf::Texture playerTexture;
-    if(!playerTexture.loadFromFile("placeholder_spritesheet.png"))
-        cout << "ERROR: Could not load player image." << endl;
-
-    sf::Sprite playerImage;
-    playerImage.setTexture(playerTexture);
 
     // TODO this all needs to be moved into it's own object (& within an init function) for displaying main menu
     sf::Font font;
@@ -56,16 +66,6 @@ int main()
     text.setStyle(sf::Text::Bold);
     text.setPosition(300, 50); // TODO needs to be soft-coded, so relative to resolution etc
 
-    enum spriteDirection { Down, Left, Right, Up };
-    sf::Vector2i source(0, Down);
-
-    //Player attributes - to move over to player object once created
-    sf::Vector2f position; // player's position
-    sf::Vector2f velocity; // player's velocity
-    float maxSpeed = 4.0f; // player's maximum speed
-    float acceleration = 0.5f; // player's movement acceleration // sk-iver's take a while to get moving // (previously 1.1f)
-    float deceleration = 0.98f; // player's movement deceleration // sk-iver's stop moving a lot quicker
-
     sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
 
     sf::View view;
@@ -74,107 +74,14 @@ int main()
 
     sf::Vector2f viewPosition(0, 0);
 
-    while(window.isOpen()) // beginning of game loop
+    bool quitGame = false;
+
+    while(!quitGame) // beginning of game loop
     {
-        sf::Event event;
+        quitGame = HandleEvents(window);
 
-        while(window.pollEvent(event))
-        {
-            // Debug:
-//          time = clock.getElapsedTime(); // time elapsed since first frame
-//          time = clock.restart(); // time elapsed since the last frame rendered
-//          cout << time.asSeconds() << endl;
-
-            // TODO should be pushed out to it's own controller function or something
-            switch (event.type)
-            {
-                case sf::Event::MouseMoved:
-//                    cout  << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
-                    break;
-
-                case sf::Event::MouseButtonPressed:
-                    if(event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
-                        // Debug:
-                        cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y;
-                    break;
-
-                case sf::Event::GainedFocus:
-                    cout << "Window Active" << endl;
-                    // TODO re-play audio etc
-                    break;
-
-                case sf::Event::LostFocus:
-                    cout << "Window NOT Active" << endl;
-                    // TODO pause the game & audio etc
-                    break;
-
-                case sf::Event::Resized:
-//                    window.setView(sf::View(sf::FloatRect(0, 0, Event.size.width, Event.size.height))); // letterboxes to keep same original resolution
-                    cout << "New width: " << event.size.width << ", new height: " << event.size.height << endl;
-                    break;
-
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-
-                default:
-                    cout << endl;
-                    break;
-            }
-
-        }
-
-        // vertical movement
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            source.y = Up;
-
-            velocity.y -= acceleration; // apply forward acceleration by decrementing y velocity
-
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            source.y = Down;
-
-            velocity.y += acceleration; // apply backward acceleration by incrementing y velocity
-        } else
-            velocity.y *= deceleration; // decelerate
-
-        // horizontal movement
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) or sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            source.y = Right;
-
-            velocity.x += acceleration; // apply rightward acceleration
-        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) or sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            source.y = Left;
-
-            velocity.x -= acceleration; // apply leftward acceleration
-            // velocity.x -= acceleration * deltaTime.restart().asSeconds();
-        } else {
-            velocity.x *= deceleration; // else, not moving horizontally, so apply deceleration (why '*='?)
-        }
-
-        // now that we've updated our velocity, make sure we're not going beyond max speed:
-        float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
-
-        if (actualSpeed > maxSpeed) // are we going too fast?
-            velocity *= maxSpeed / actualSpeed; // scale our velocity down so we are going at the max speed
-
-        // now we have our final velocity, update player's position
-        position += velocity; // TODO update class
-        // TODO extra function call to catch player going off screen
-
-        // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
-        frameCounter += frameSpeed * clock.restart().asSeconds();
-        // if 500 frames have passed, cycle through to next animation
-        if (frameCounter >= switchFrame){
-            // animation of sprite through SS images, based on which direction facing
-            source.x++;
-            if(source.x * 256 >= playerTexture.getSize().x)
-                source.x = 0;
-
-            frameCounter = 0;
-        }
-
-        playerImage.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
-        playerImage.setPosition(position);
+        player.getInputs();
+        player.update(clock, frameCounter, frameSpeed);
 
         // random noise example:
         for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
@@ -200,8 +107,8 @@ int main()
             }
         }
 
-        viewPosition.x = position.x + 10 - (screenDimensions.x / 2);
-        viewPosition.y = position.y + 10 - (screenDimensions.y / 2);
+        viewPosition.x = player.getPosition().x + 10 - (screenDimensions.x / 2);
+        viewPosition.y = player.getPosition().y + 10 - (screenDimensions.y / 2);
 
         if(viewPosition.x < 0)
             viewPosition.x = 0;
@@ -213,7 +120,7 @@ int main()
         window.setView(view);
 
         window.draw(circle);
-        window.draw(playerImage);
+        window.draw(player.sprite); // this should be a function call to a player.draw() function
 
         view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
         // and the noise background because that was drawn before the view was reset
