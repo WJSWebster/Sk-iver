@@ -46,7 +46,7 @@ public:
 //    sf::Sprite getSprite();
     void setSprite(); // has no parameters as users Diver.texture, which is already set
     void getInputs();
-    void update(sf::Clock clock, float frameCounter, float frameSpeed);
+    float update(sf::Clock clock, float frameCounter, float frameSpeed);
     // others...
 
 private: // should be a singleton?

@@ -129,12 +129,14 @@ float Diver::getAnimationFrame() {
 void Diver::getInputs(){
     // vertical movement
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        source.y = directions["Up"];
+//        source.y = directions["Up"];
+        source.y = 3;
 
         velocity.y -= acceleration; // apply forward acceleration by decrementing y velocity
 
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        source.y = directions["Down"];
+//        source.y = directions["Down"];
+        source.y = 0;
 
         velocity.y += acceleration; // apply backward acceleration by incrementing y velocity
     } else
@@ -142,11 +144,13 @@ void Diver::getInputs(){
 
     // horizontal movement
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) or sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        source.y = directions["Right"];
+//        source.y = directions["Right"];
+        source.y = 2;
 
         velocity.x += acceleration; // apply rightward acceleration
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) or sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        source.y = directions["Left"];
+//        source.y = directions["Left"];
+        source.y = 1;
 
         velocity.x -= acceleration; // apply leftward acceleration
         // velocity.x -= acceleration * deltaTime.restart().asSeconds();
@@ -155,7 +159,7 @@ void Diver::getInputs(){
     }
 }
 
-void Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
+float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     // now that we've updated our velocity, make sure we're not going beyond max speed:
     float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
 
@@ -182,4 +186,6 @@ void Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
 
     sprite.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
     sprite.setPosition(position);
+
+    return frameCounter;
 }

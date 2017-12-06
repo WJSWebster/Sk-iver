@@ -6,6 +6,7 @@
 
 #include "HandleEvents.h"
 #include "Diver.h"
+#include "Background.h"
 
 #include <iostream>
 #include <string>
@@ -15,18 +16,16 @@
 using namespace std;
 
 // Function Declarations:
-//bool handle_events(sf::RenderWindow& window);
-
-struct game_state {
-    // this contains the state of your game, such as positions and velocities
-};
+//bool handle_events(sf::RenderWindow& window); etc...
 
 
 // Function Definitions: // TODO should be below the main method
 
 int main()
 {
+//    sf::Vector2u size(800, 600);
     sf::Vector2i screenDimensions(800, 600);
+//    size = (1080, 920);
     sf::Vector2i blockDimensions(10, 10); // (only used for random noise example)
 
     sf::RenderWindow window;
@@ -35,6 +34,10 @@ int main()
     sf::Clock clock;
     sf::SoundBuffer soundBuffer; // TODO currently not used
     sf::Sound sound;             // TODO currently not used
+
+    // initialise 'background' object -> TODO make object
+    class Background background;
+
 
     // initialise 'player' Diver object
     class Diver player;
@@ -81,9 +84,9 @@ int main()
         quitGame = HandleEvents(window);
 
         player.getInputs();
-        player.update(clock, frameCounter, frameSpeed);
+        frameCounter = player.update(clock, frameCounter, frameSpeed);
 
-        // random noise example:
+        /*// random noise example - todo should move to it's own class and then called to to update/render:
         for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
         {
             for(int j = 0; j < screenDimensions.y / blockDimensions.y; j++)
@@ -105,7 +108,7 @@ int main()
 
                 window.draw(vertexArray);
             }
-        }
+        } */
 
         viewPosition.x = player.getPosition().x + 10 - (screenDimensions.x / 2);
         viewPosition.y = player.getPosition().y + 10 - (screenDimensions.y / 2);
@@ -119,6 +122,7 @@ int main()
 
         window.setView(view);
 
+        window.draw(background.sprite);
         window.draw(circle);
         window.draw(player.sprite); // this should be a function call to a player.draw() function
 
