@@ -23,9 +23,7 @@ using namespace std;
 
 int main()
 {
-//    sf::Vector2u size(800, 600);
-    sf::Vector2i screenDimensions(800, 600);
-//    size = (1080, 920);
+    sf::Vector2u screenDimensions(1080, 920);
     sf::Vector2i blockDimensions(10, 10); // (only used for random noise example)
 
     sf::RenderWindow window;
@@ -38,15 +36,13 @@ int main()
     // initialise 'background' object -> TODO make object
     class Background background;
 
-
     // initialise 'player' Diver object
     class Diver player;
     player.setTexture("placeholder_spritesheet.png");
     player.setSprite();
 
-//    should just re-assign screenDimension and use here
-    sf::Vector2u size(1080, 920);
-    window.setSize(size);
+    // should just re-assign screenDimension and use here
+//    window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
     window.setPosition(sf::Vector2i(200, 100));
     window.setKeyRepeatEnabled(false); // TODO investigate
@@ -83,11 +79,23 @@ int main()
     {
         quitGame = HandleEvents(window);
 
+        // note: does not work alongside view.reset
+        // camera zoom
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+            view.zoom(1.01f);  // zooms out
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+            view.zoom(0.99f);   // zooms in
+        // camera rotate
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+            view.rotate(0.5f);  // rotates clockwise
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+            view.rotate(-0.5f);   // rotates anti-clockwise
+
         player.getInputs();
         frameCounter = player.update(clock, frameCounter, frameSpeed);
 
-        /*// random noise example - todo should move to it's own class and then called to to update/render:
-        for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
+         // random noise example - todo should move to it's own class and then called to to update/render:
+        /* for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
         {
             for(int j = 0; j < screenDimensions.y / blockDimensions.y; j++)
             {
@@ -118,7 +126,9 @@ int main()
         if(viewPosition.y < 0)
             viewPosition.y = 0;
 
-        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
+        // TODO see https://www.youtube.com/watch?v=pdB7M8J5n-k for better camera centering
+
+//        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
 
         window.setView(view);
 
@@ -126,7 +136,8 @@ int main()
         window.draw(circle);
         window.draw(player.sprite); // this should be a function call to a player.draw() function
 
-        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
+//        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
+
         // and the noise background because that was drawn before the view was reset
         window.setView(view);
         window.draw(text);
