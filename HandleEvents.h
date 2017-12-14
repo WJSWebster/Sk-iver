@@ -5,12 +5,7 @@
 #ifndef SK_IVER_HANDLEEVENTS_H
 #define SK_IVER_HANDLEEVENTS_H
 
-
-//class HandleEvents {
-//
-//};
-
-bool HandleEvents(sf::RenderWindow& window);
+bool HandleEvents(sf::RenderWindow& window, sf::Sound sound);
 
 
 #endif //SK_IVER_HANDLEEVENTS_H

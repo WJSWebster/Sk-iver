@@ -3,12 +3,13 @@
 //
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "HandleEvents.h"
 
 using namespace std;
 
-bool HandleEvents(sf::RenderWindow& window) {
+bool HandleEvents(sf::RenderWindow& window, sf::Sound sound) {
     // poll for events
 
     sf::Event event;
@@ -35,12 +36,13 @@ bool HandleEvents(sf::RenderWindow& window) {
 
             case sf::Event::GainedFocus:
                 cout << "Window Active" << endl;
-                // TODO re-play audio etc
+                sound.play();
                 break;
 
             case sf::Event::LostFocus:
                 cout << "Window NOT Active" << endl;
-                // TODO pause the game & audio etc
+                sound.pause();
+                // TODO pause the game mechanics
                 break;
 
             case sf::Event::Resized:

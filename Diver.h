@@ -45,7 +45,7 @@ public:
     void setTexture(string filePath);
 //    sf::Sprite getSprite();
     void setSprite(); // has no parameters as users Diver.texture, which is already set
-    void getInputs();
+    void getInputs(sf::View view);
     float update(sf::Clock clock, float frameCounter, float frameSpeed);
     // others...
 
@@ -53,9 +53,8 @@ private: // should be a singleton?
     int x; // to be replaced with position.x
     int y; // to be replaced with position.y
     int size;
+    sf::Vector2i spriteDimensions;
 
-//    sf::Texture texture;
-//    sf::Sprite sprite;
     map<string, int> directions;
 
     sf::Vector2i source;

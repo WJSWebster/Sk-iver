@@ -4,7 +4,6 @@
 
 #include <SFML/Graphics.hpp>
 #include "Diver.h"
-#include <iostream>
 #include <cmath>
 #include <map>
 
@@ -14,9 +13,8 @@ using namespace std;
 Diver::Diver() {
     x = 0;
     y = 0;
+    spriteDimensions.x = 256, spriteDimensions.y = 256; // todo is there not a better way to do this?
     size = 20;
-    sf::Texture texture;
-    sf::Sprite sprite;
 //    enum class Directions{Down, Left, Right, Up}; // defition of a type, not variable
     map<string, int> directions = { {"Down", 0}, // like an array, but rather than an index no, uses a key value (ie, an associative array)
                                     {"Left", 1},
@@ -30,7 +28,7 @@ Diver::Diver() {
     acceleration = 0.5f;
     deceleration = 0.98f;
 
-    animationFrame = 100;
+    animationFrame = 500; // or 100?
 }
 
 Diver::~Diver() {};
@@ -60,19 +58,11 @@ void Diver::setSize(int size) {
     Diver::size = size;
 }
 
-//sf::Texture Diver::getTexture(){
-//    return texture;
-//}
-
 void Diver::setTexture(string filePath) {
     //sf::Texture Diver::texture; // object already created in the constructor
     if(!texture.loadFromFile(filePath))
         cout << "ERROR: Could not load diver texture from file path." << endl;
 }
-
-//const sf::Sprite &Diver::getSprite() const {
-//    return playerImage;
-//}
 
 void Diver::setSprite() {
     // should enclose in a try catch for in case texture not already loaded
@@ -126,19 +116,21 @@ float Diver::getAnimationFrame() {
 }
 
 // Functions::
-void Diver::getInputs(){
+void Diver::getInputs(sf::View view){
     // vertical movement
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) or sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
 //        source.y = directions["Up"];
         source.y = 3;
 
         velocity.y -= acceleration; // apply forward acceleration by decrementing y velocity
+        // view.zoom(0.99f);   // zooms in
 
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 //        source.y = directions["Down"];
         source.y = 0;
 
         velocity.y += acceleration; // apply backward acceleration by incrementing y velocity
+        // view.zoom(1.01f);   // zooms in todo return view/figure out best way of changing variable
     } else
         velocity.y *= deceleration; // decelerate
 
@@ -173,18 +165,19 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     // needs to be moved to it's own class VVV
 
     // "* clock.restart().asSeconds" keeps the animation consistent through realtime, rather than depending on cpu's clockspeed
-    frameCounter += frameSpeed * clock.restart().asSeconds();
+    frameCounter += frameSpeed * clock.restart().asSeconds(); //clock.getElapsedTime().asMicroseconds();
+
     // if 500 frames have passed, cycle through to next animation
     if (frameCounter >= getAnimationFrame()) {
         // animation of sprite through SS images, based on which direction facing
         source.x++;
-        if (texture.getSize().x <= source.x * 256)
+        if (texture.getSize().x <= source.x * spriteDimensions.x)
             source.x = 0;
 
         frameCounter = 0;
     }
 
-    sprite.setTextureRect(sf::IntRect(source.x * 256, source.y * 256, 256, 256));
+    sprite.setTextureRect(sf::IntRect(source.x * spriteDimensions.x, source.y * spriteDimensions.y, spriteDimensions.x, spriteDimensions.y));
     sprite.setPosition(position);
 
     return frameCounter;

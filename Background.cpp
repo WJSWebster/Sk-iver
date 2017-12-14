@@ -4,15 +4,11 @@
 
 #include <SFML/Graphics.hpp>
 #include "Background.h"
-#include <iostream>
 
 using namespace std;
 
 Background::Background() {
-    sf::Texture texture;
     setImage("skydiving_placeholder.jpg");
-
-    sf::Sprite sprite;
     setSprite();
 }
 

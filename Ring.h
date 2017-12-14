@@ -5,14 +5,14 @@
 #ifndef SK_IVER_RING_H
 #define SK_IVER_RING_H
 
+#include <SFML/Graphics.hpp>
+
 class Ring
 {
-    int x = 0;
-    int y = 0;
-    double size = 0;
-
 public:
-    Ring(int x, int y, double size);
+    Ring();
+
+    sf::CircleShape circle;
 
     int getX() const;
 
@@ -24,7 +24,24 @@ public:
 
     double getSize() const;
 
-    void setSize(double size);
+    void setSize(float size);
+
+    float getCurrSize() const;
+
+    void setCurrSize(float currSize);
+
+    void update();
+
+private:
+    int orgX;
+    int orgY;
+    float currX;
+    float currY;
+
+    float currSize;
+    float size;
+
+    sf::Color outlineColor;
 };
 
 #endif //SK_IVER_RING_H

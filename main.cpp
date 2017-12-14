@@ -7,6 +7,7 @@
 #include "HandleEvents.h"
 #include "Diver.h"
 #include "Background.h"
+#include "Ring.h"
 
 #include <iostream>
 #include <string>
@@ -27,11 +28,20 @@ int main()
     sf::Vector2i blockDimensions(10, 10); // (only used for random noise example)
 
     sf::RenderWindow window;
-    window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "My first SFML Game", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+    window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Sk-iver", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 
     sf::Clock clock;
-    sf::SoundBuffer soundBuffer; // TODO currently not used
-    sf::Sound sound;             // TODO currently not used
+
+    sf::SoundBuffer soundBuffer;
+    sf::Sound sound;
+
+    if(!soundBuffer.loadFromFile("nice_music.ogg")) // if audio file is longer than 30 secs, should probs just stream as Music instead
+        cout << "ERROR: could not load audio file from file path" << endl;
+
+    sound.setBuffer(soundBuffer);
+    sound.setLoop(true);
+    sound.setVolume(20);
+    sound.play();
 
     // initialise 'background' object -> TODO make object
     class Background background;
@@ -44,7 +54,7 @@ int main()
     // should just re-assign screenDimension and use here
 //    window.setSize(size);
 //    window.setTitle("Skᵧ ᴰiver");
-    window.setPosition(sf::Vector2i(200, 100));
+    window.setPosition(sf::Vector2i(200, 150));
     window.setKeyRepeatEnabled(false); // TODO investigate
     window.setVerticalSyncEnabled(1);
     window.setFramerateLimit(60);
@@ -60,12 +70,15 @@ int main()
 //    basic_string<sf::Uint32> string = {0x53, 0x6B, 0x671D0000, 0x20, 0x1D30, 0x69, 0x76, 0x65, 0x72};
 //    sf::String sentence(string);
 //    sf::String sentence = "Skᵧ ᴰiver";
-    sf::Text text("Sk-iver", font, 60); // Title
+    // Title
+    sf::Text text("Sk-iver", font, 60);
     text.setColor(sf::Color::Magenta); // function deprecated?
     text.setStyle(sf::Text::Bold);
-    text.setPosition(300, 50); // TODO needs to be soft-coded, so relative to resolution etc
+    float textAnchorY = (screenDimensions.x / 2) - (text.getLocalBounds().width / 2);
+    text.setPosition(textAnchorY, 50);
 
     sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
+    class Ring ring;
 
     sf::View view;
     view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
@@ -77,7 +90,7 @@ int main()
 
     while(!quitGame) // beginning of game loop
     {
-        quitGame = HandleEvents(window);
+        quitGame = HandleEvents(window, sound);
 
         // note: does not work alongside view.reset
         // camera zoom
@@ -91,11 +104,27 @@ int main()
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
             view.rotate(-0.5f);   // rotates anti-clockwise
 
-        player.getInputs();
+        player.getInputs(view);
         frameCounter = player.update(clock, frameCounter, frameSpeed);
 
-         // random noise example - todo should move to it's own class and then called to to update/render:
-        /* for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
+        viewPosition.x = player.getPosition().x + 10 - (screenDimensions.x / 2);
+        viewPosition.y = player.getPosition().y + 10 - (screenDimensions.y / 2);
+
+        if(viewPosition.x < 0)
+            viewPosition.x = 0;
+        if(viewPosition.y < 0)
+            viewPosition.y = 0;
+
+        // TODO see https://www.youtube.com/watch?v=pdB7M8J5n-k for better camera centering
+
+        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
+
+        window.setView(view);
+
+        window.draw(background.sprite);
+
+        // random noise example - todo should move to it's own class and then called to to update/render:
+        for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
         {
             for(int j = 0; j < screenDimensions.y / blockDimensions.y; j++)
             {
@@ -112,35 +141,25 @@ int main()
                     int blue    = rand() % 255;
 
                     vertexArray[k].color = sf::Color(red, green, blue);
+                    vertexArray[k].color.a = 30; // sets the alpha
                 }
 
                 window.draw(vertexArray);
             }
-        } */
+        }
 
-        viewPosition.x = player.getPosition().x + 10 - (screenDimensions.x / 2);
-        viewPosition.y = player.getPosition().y + 10 - (screenDimensions.y / 2);
+        ring.update();
+        window.draw(ring.circle);
 
-        if(viewPosition.x < 0)
-            viewPosition.x = 0;
-        if(viewPosition.y < 0)
-            viewPosition.y = 0;
-
-        // TODO see https://www.youtube.com/watch?v=pdB7M8J5n-k for better camera centering
-
-//        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
-
-        window.setView(view);
-
-        window.draw(background.sprite);
-        window.draw(circle);
         window.draw(player.sprite); // this should be a function call to a player.draw() function
 
-//        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
+
+        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
 
         // and the noise background because that was drawn before the view was reset
         window.setView(view);
         window.draw(text);
+
         window.display();
 
         window.clear();
