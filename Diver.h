@@ -15,19 +15,15 @@ class Diver
 {
 public:
     // Constructor & Destructor:
-    Diver();
+    explicit Diver(sf::RenderWindow &window);
+
     ~Diver();
 
     // Getters & Setters:
-    int getX(); // to be replaced with position.x
-    void setX(int x); // to be replaced with position.x
-    int getY(); // to be replaced with position.y
-    void setY(int y); // to be replaced with position.y
-    int getSize();
-    void setSize(int size);
     sf::Texture texture;
     sf::Sprite sprite;
 //    enum class Directions{Down, Left, Right, Up};
+    sf::Vector2f getSize();
     sf::Vector2f getPosition();
     void setPosition(sf::Vector2f position);
     sf::Vector2f getVelocity();
@@ -47,15 +43,15 @@ public:
     void setSprite(); // has no parameters as users Diver.texture, which is already set
     void getInputs(sf::View view);
     float update(sf::Clock clock, float frameCounter, float frameSpeed);
+    void draw(sf::RenderWindow &window);
     // others...
 
 private: // should be a singleton?
-    int x; // to be replaced with position.x
-    int y; // to be replaced with position.y
-    int size;
-    sf::Vector2i spriteDimensions;
+    sf::Vector2f spriteDimensions;
 
     map<string, int> directions;
+
+    sf::Vector2i screenSize;
 
     sf::Vector2i source;
     sf::Vector2f position;
@@ -65,6 +61,8 @@ private: // should be a singleton?
     float deceleration;
 
     float animationFrame;
+
+    void checkOutOfBounds();
 };
 
 #endif //SK_IVER_PLAYER_H

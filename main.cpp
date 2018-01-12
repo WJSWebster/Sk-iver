@@ -24,18 +24,19 @@ using namespace std;
 
 int main()
 {
-    sf::Vector2u screenDimensions(1080, 920);
+    sf::Vector2u screenDimensions(1920, 1280); // a 3:2 resolution, for 16:9 = (1920, 1080)
     sf::Vector2i blockDimensions(10, 10); // (only used for random noise example)
 
     sf::RenderWindow window;
     window.create(sf::VideoMode(screenDimensions.x, screenDimensions.y), "Sk-iver", sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
+    // window.setIcon(32, 32, ""); how to convert a png to C sourcecode pixel data?
 
     sf::Clock clock;
 
     sf::SoundBuffer soundBuffer;
     sf::Sound sound;
 
-    if(!soundBuffer.loadFromFile("nice_music.ogg")) // if audio file is longer than 30 secs, should probs just stream as Music instead
+    if(!soundBuffer.loadFromFile("Resources/Sounds/nice_music.ogg")) // if audio file is longer than 30 secs, should probs just stream as Music instead
         cout << "ERROR: could not load audio file from file path" << endl;
 
     sound.setBuffer(soundBuffer);
@@ -43,13 +44,12 @@ int main()
     sound.setVolume(20);
     sound.play();
 
-    // initialise 'background' object -> TODO make object
-    class Background background;
+    // initialise 'background' object
+    class Background background(window);
 
     // initialise 'player' Diver object
-    class Diver player;
-    player.setTexture("placeholder_spritesheet.png");
-    player.setSprite();
+    class Diver player(window);
+
 
     // should just re-assign screenDimension and use here
 //    window.setSize(size);
@@ -72,19 +72,25 @@ int main()
 //    sf::String sentence = "Skᵧ ᴰiver";
     // Title
     sf::Text text("Sk-iver", font, 60);
-    text.setColor(sf::Color::Magenta); // function deprecated?
+    sf::Color textColour = sf::Color::Magenta;
+    text.setFillColor(textColour);
+    int textAlpha = 256;
     text.setStyle(sf::Text::Bold);
     float textAnchorY = (screenDimensions.x / 2) - (text.getLocalBounds().width / 2);
     text.setPosition(textAnchorY, 50);
 
-    sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
+    //sf::CircleShape circle(200, 16); // TODO move into constructor for ring's own class
     class Ring ring;
 
-    sf::View view;
-    view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
-    view.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+    sf::View backgroundView;
+    backgroundView.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
+    backgroundView.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-    sf::Vector2f viewPosition(0, 0);
+    sf::View playerView;
+    playerView.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
+    playerView.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+
+//    sf::Vector2f viewPosition(0, 0);  // todo - no longer used as of implementation of more static camera
 
     bool quitGame = false;
 
@@ -92,36 +98,27 @@ int main()
     {
         quitGame = HandleEvents(window, sound);
 
-        // note: does not work alongside view.reset
+        // note: does not work alongside backgroundView.reset
+        // todo: needs to be moved into event handler
         // camera zoom
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
-            view.zoom(1.01f);  // zooms out
+            backgroundView.zoom(1.01f);  // zooms out - todo, limit
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
-            view.zoom(0.99f);   // zooms in
+            backgroundView.zoom(0.99f);   // zooms in
         // camera rotate
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-            view.rotate(0.5f);  // rotates clockwise
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-            view.rotate(-0.5f);   // rotates anti-clockwise
-
-        player.getInputs(view);
-        frameCounter = player.update(clock, frameCounter, frameSpeed);
-
-        viewPosition.x = player.getPosition().x + 10 - (screenDimensions.x / 2);
-        viewPosition.y = player.getPosition().y + 10 - (screenDimensions.y / 2);
-
-        if(viewPosition.x < 0)
-            viewPosition.x = 0;
-        if(viewPosition.y < 0)
-            viewPosition.y = 0;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            backgroundView.rotate(0.5f);  // rotates clockwise
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            backgroundView.rotate(-0.5f);   // rotates anti-clockwise
 
         // TODO see https://www.youtube.com/watch?v=pdB7M8J5n-k for better camera centering
 
-        view.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
+//        backgroundView.reset(sf::FloatRect(viewPosition.x, viewPosition.y, screenDimensions.x, screenDimensions.y));
 
-        window.setView(view);
+        window.setView(backgroundView);
 
-        window.draw(background.sprite);
+        background.update();
+        background.draw(window);
 
         // random noise example - todo should move to it's own class and then called to to update/render:
         for(int i = 0; i < screenDimensions.x / blockDimensions.x; i++)
@@ -148,16 +145,30 @@ int main()
             }
         }
 
-        ring.update();
-        window.draw(ring.circle);
+        ring.update(player);
+        ring.draw(window);
+
+
+        window.setView(playerView);
+
+        player.getInputs(backgroundView);
+        frameCounter = player.update(clock, frameCounter, frameSpeed);
+        player.draw(window);
 
         window.draw(player.sprite); // this should be a function call to a player.draw() function
 
 
-        view.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
+//        backgroundView.reset(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y)); // means that the title stays in a fixed place
 
-        // and the noise background because that was drawn before the view was reset
-        window.setView(view);
+        // and the noise background because that was drawn before the backgroundView was reset
+//        window.setView(backgroundView);
+
+        // slowly fades out title - todo: needs to be in it's own text object
+        if (clock.getElapsedTime().asSeconds() > 5 and textAlpha > 0){
+            textColour.a = textAlpha--; // decrements after assignment - this is fine
+            text.setFillColor(textColour);
+        }
+
         window.draw(text);
 
         window.display();

@@ -6,6 +6,7 @@
 #define SK_IVER_RING_H
 
 #include <SFML/Graphics.hpp>
+#include "Diver.h"
 
 class Ring
 {
@@ -30,18 +31,32 @@ public:
 
     void setCurrSize(float currSize);
 
-    void update();
+    void update(Diver player);
+
+    void draw(sf::RenderWindow &window);
 
 private:
+    int stage;
+
     int orgX;
     int orgY;
     float currX;
     float currY;
 
-    float currSize;
     float size;
 
     sf::Color outlineColor;
+
+    sf::SoundBuffer hitBuffer;
+    sf::Sound hitSound;
+    sf::SoundBuffer missBuffer;
+    sf::Sound missSound;
+
+    void makeMoreTransparent();
+
+    void makeMoreOpaque();
+
+    void makeMoreBlue();
 };
 
 #endif //SK_IVER_RING_H

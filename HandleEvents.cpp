@@ -24,10 +24,6 @@ bool HandleEvents(sf::RenderWindow& window, sf::Sound sound) {
         // TODO should be pushed out to it's own controller function or something
         switch (event.type)
         {
-            case sf::Event::MouseMoved:
-//                    cout  << Event.mouseMove.x << ", Y: " << Event.mouseMove.y << endl;
-                break;
-
             case sf::Event::MouseButtonPressed:
                 if(event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
                     // Debug:
@@ -46,7 +42,7 @@ bool HandleEvents(sf::RenderWindow& window, sf::Sound sound) {
                 break;
 
             case sf::Event::Resized:
-//                    window.setView(sf::View(sf::FloatRect(0, 0, Event.size.width, Event.size.height))); // letterboxes to keep same original resolution
+                window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height))); // letterboxes to keep same original resolution
                 cout << "New width: " << event.size.width << ", new height: " << event.size.height << endl;
                 break;
 
@@ -54,8 +50,8 @@ bool HandleEvents(sf::RenderWindow& window, sf::Sound sound) {
 //                window.close();
                 return true;
 
-            default:
-                cout << endl;
+            default: // if other type of pollEvent
+                // if window.pollEvent(event) but none of the event types listed here
                 break;
         }
 

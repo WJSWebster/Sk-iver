@@ -10,20 +10,32 @@
 using namespace std;
 
 // Constructor & Destructor:
-Diver::Diver() {
-    x = 0;
-    y = 0;
-    spriteDimensions.x = 256, spriteDimensions.y = 256; // todo is there not a better way to do this?
-    size = 20;
+Diver::Diver(sf::RenderWindow& window) {
+    setTexture("Resources/Images/newDiver_spritesheet2.png");
+    setSprite();
+
+    spriteDimensions.x = sprite.getLocalBounds().width / 4;
+    spriteDimensions.y = sprite.getLocalBounds().height / 4;
+
+    sprite.setScale(5, 5); // at this point globalBounds (560) becomes 5 times as much as localBounds (112):
+    cout << "spriteDimensions.x = " <<  spriteDimensions.x << ", sprite.getLocalBounds().width = " << sprite.getLocalBounds().width << ", sprite.getGlobalBounds().width = " << sprite.getGlobalBounds().width << endl;
+
 //    enum class Directions{Down, Left, Right, Up}; // defition of a type, not variable
     map<string, int> directions = { {"Down", 0}, // like an array, but rather than an index no, uses a key value (ie, an associative array)
                                     {"Left", 1},
                                     {"Right", 2},
                                     {"Up", 3} };
 
-    sf::Vector2i source(0, directions["Down"]);
-    sf::Vector2f position(0.0, 0.0);
-    sf::Vector2f velocity(0.0, 0.0);
+    /*source(0, directions["Down"]);
+    position(0.0, 0.0);
+    velocity(0.0, 0.0);*/
+
+    screenSize.x = window.getSize().x;
+    screenSize.y = window.getSize().y;
+
+    position.x = (screenSize.x - sprite.getGlobalBounds().width) / 2;
+    position.y = (screenSize.y - sprite.getGlobalBounds().height) / 2;
+
     maxSpeed = 4.0f;
     acceleration = 0.5f;
     deceleration = 0.98f;
@@ -31,33 +43,9 @@ Diver::Diver() {
     animationFrame = 500; // or 100?
 }
 
-Diver::~Diver() {};
+Diver::~Diver() {} //= default;
 
 // Getters & Setters:
-int Diver::getX() {
-    return x;
-}
-
-void Diver::setX(int x) {
-    Diver::x = x;
-}
-
-int Diver::getY() {
-    return y;
-}
-
-void Diver::setY(int y) {
-    Diver::y = y;
-}
-
-int Diver::getSize() {
-    return size;
-}
-
-void Diver::setSize(int size) {
-    Diver::size = size;
-}
-
 void Diver::setTexture(string filePath) {
     //sf::Texture Diver::texture; // object already created in the constructor
     if(!texture.loadFromFile(filePath))
@@ -69,7 +57,11 @@ void Diver::setSprite() {
     sprite.setTexture(texture);
 }
 
-// getDirections
+sf::Vector2f Diver::getSize(){
+//    cout << "spriteDimensions.x: " << spriteDimensions.x << ", sprite.globalBounds().width: " << sprite.getGlobalBounds().width << endl;
+    return spriteDimensions;
+//    return sprite.getGlobalBounds().type;
+}
 
 sf::Vector2f Diver::getPosition(){
     return position;
@@ -123,14 +115,13 @@ void Diver::getInputs(sf::View view){
         source.y = 3;
 
         velocity.y -= acceleration; // apply forward acceleration by decrementing y velocity
-        // view.zoom(0.99f);   // zooms in
-
+//         view.zoom(0.99f);   // zooms in
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) or sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 //        source.y = directions["Down"];
         source.y = 0;
 
         velocity.y += acceleration; // apply backward acceleration by incrementing y velocity
-        // view.zoom(1.01f);   // zooms in todo return view/figure out best way of changing variable
+//         view.zoom(1.01f);   // zooms in todo return view/figure out best way of changing variable
     } else
         velocity.y *= deceleration; // decelerate
 
@@ -138,6 +129,7 @@ void Diver::getInputs(sf::View view){
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) or sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 //        source.y = directions["Right"];
         source.y = 2;
+        //background.setRotation(
 
         velocity.x += acceleration; // apply rightward acceleration
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) or sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -151,6 +143,18 @@ void Diver::getInputs(sf::View view){
     }
 }
 
+void Diver::checkOutOfBounds(){
+    if(position.x < 0)
+        position.x = 0;
+    else if (position.x + sprite.getGlobalBounds().width > screenSize.x )
+        position.x = screenSize.x - sprite.getGlobalBounds().width;
+
+    if(position.y < 0)
+        position.y = 0;
+    else if (position.y + sprite.getGlobalBounds().height > screenSize.y )
+        position.y = screenSize.y - sprite.getGlobalBounds().height;
+}
+
 float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     // now that we've updated our velocity, make sure we're not going beyond max speed:
     float actualSpeed = sqrt((velocity.x * velocity.x) + (velocity.y * velocity.y)); // a*a + b*b = c*c
@@ -160,7 +164,8 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
 
     // now we have our final velocity, update player's position
     position += velocity; // TODO update class
-    // TODO extra function call to catch player going off screen
+
+    checkOutOfBounds(); // check if player is outside the bounds
 
     // needs to be moved to it's own class VVV
 
@@ -168,7 +173,7 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     frameCounter += frameSpeed * clock.restart().asSeconds(); //clock.getElapsedTime().asMicroseconds();
 
     // if 500 frames have passed, cycle through to next animation
-    if (frameCounter >= getAnimationFrame()) {
+    if (frameCounter >= getAnimationFrame() + 10000) {
         // animation of sprite through SS images, based on which direction facing
         source.x++;
         if (texture.getSize().x <= source.x * spriteDimensions.x)
@@ -181,4 +186,8 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     sprite.setPosition(position);
 
     return frameCounter;
+}
+
+void Diver::draw(sf::RenderWindow& window){
+    window.draw(sprite);
 }
