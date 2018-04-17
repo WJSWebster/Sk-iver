@@ -15,33 +15,39 @@ public:
 
     sf::CircleShape circle;
 
-    int getX() const;
+    int getStage();
+    void incrementStage();
 
+    float getX() const;
     void setX(int x);
 
-    int getY() const;
-
+    float getY() const;
     void setY(int y);
 
     double getSize() const;
-
     void setSize(float size);
 
     float getCurrSize() const;
-
     void setCurrSize(float currSize);
 
-    void update(Diver player);
+    int getPoints();
+    int incPoints(int pointInc);
 
-    void draw(sf::RenderWindow &window);
+    void loadHitSound();
+    void playHitSound();
+
+    void loadMissSound();
+    void playMissSound();
+
+    void update(Diver player);
+    void draw();
 
 private:
     int stage;
+    int points;
 
-    int orgX;
-    int orgY;
-    float currX;
-    float currY;
+    float x;
+    float y;
 
     float size;
 
@@ -57,6 +63,8 @@ private:
     void makeMoreOpaque();
 
     void makeMoreBlue();
+
+    void resetOrigin();
 };
 
 #endif //SK_IVER_RING_H

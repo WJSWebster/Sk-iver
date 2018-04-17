@@ -11,15 +11,13 @@
 
 class Background {
 public:
-    explicit Background(sf::RenderWindow &window);
-
+    Background();
     ~Background();
 
     void setRotation(float rotation);
 
-    void draw(sf::RenderWindow &window);
-
     void update();
+    void draw();
 
 private:
     sf::Vector2i windowSize;
@@ -34,6 +32,8 @@ private:
 
     void setImage(std::string filePath);
     void setSprite();
+
+
 };
 
 

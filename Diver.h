@@ -15,8 +15,7 @@ class Diver
 {
 public:
     // Constructor & Destructor:
-    explicit Diver(sf::RenderWindow &window);
-
+    Diver();
     ~Diver();
 
     // Getters & Setters:
@@ -43,7 +42,7 @@ public:
     void setSprite(); // has no parameters as users Diver.texture, which is already set
     void getInputs(sf::View view);
     float update(sf::Clock clock, float frameCounter, float frameSpeed);
-    void draw(sf::RenderWindow &window);
+    void draw();
     // others...
 
 private: // should be a singleton?

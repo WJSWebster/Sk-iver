@@ -9,7 +9,9 @@
 
 using namespace std;
 
-bool HandleEvents(sf::RenderWindow& window, sf::Sound sound) {
+extern sf::RenderWindow window;
+
+bool HandleEvents(sf::Sound sound) {
     // poll for events
 
     sf::Event event;

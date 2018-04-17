@@ -7,7 +7,9 @@
 
 using namespace std;
 
-Background::Background(sf::RenderWindow& window) {
+extern sf::RenderWindow window;
+
+Background::Background() {
     setImage("Resources/Images/skydiving_placeholder.jpg");
     setSprite();
 
@@ -61,6 +63,6 @@ void Background::update(){
     sprite.setScale(newScale);
 }
 
-void Background::draw(sf::RenderWindow& window){
+void Background::draw(){
     window.draw(sprite);
 }

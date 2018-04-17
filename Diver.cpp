@@ -9,9 +9,11 @@
 
 using namespace std;
 
+extern sf::RenderWindow window;
+
 // Constructor & Destructor:
-Diver::Diver(sf::RenderWindow& window) {
-    setTexture("Resources/Images/newDiver_spritesheet2.png");
+Diver::Diver() {
+    setTexture("Resources/Images/newDiver_spritesheet3.png");
     setSprite();
 
     spriteDimensions.x = sprite.getLocalBounds().width / 4;
@@ -173,7 +175,7 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     frameCounter += frameSpeed * clock.restart().asSeconds(); //clock.getElapsedTime().asMicroseconds();
 
     // if 500 frames have passed, cycle through to next animation
-    if (frameCounter >= getAnimationFrame() + 10000) {
+    if (frameCounter >= getAnimationFrame() + 100000) {
         // animation of sprite through SS images, based on which direction facing
         source.x++;
         if (texture.getSize().x <= source.x * spriteDimensions.x)
@@ -188,6 +190,6 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
     return frameCounter;
 }
 
-void Diver::draw(sf::RenderWindow& window){
+void Diver::draw(){
     window.draw(sprite);
 }
