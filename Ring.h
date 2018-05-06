@@ -39,7 +39,7 @@ public:
     void loadMissSound();
     void playMissSound();
 
-    void update(Diver player);
+    int update(Diver player);
     void draw();
 
 private:

@@ -85,7 +85,9 @@ int main()
     scoreColour.a = 150;
     score.setFillColor(scoreColour);
     score.setStyle(sf::Text::Italic);
-    score.setPosition((screenDimensions.x - score.getGlobalBounds().width), score.getGlobalBounds().height);
+//    score.setPosition(screenDimensions.x - score.getGlobalBounds().width, 0);
+    score.setOutlineColor(sf::Color::Black);
+    score.setOutlineThickness(5);
 
     //Ring ring;
     vector<Ring> rings; // make a vector, of type 'Ring', called rings
@@ -136,14 +138,10 @@ int main()
 
         }
 
-        for(size_t i = 0; i < rings.size(); i++)
+        for(int i = 0; i < rings.size(); i++) // TODO: change to foreach loop instead?
         {
             if(rings[i].getStage() <= 1) {
-                rings[i].update(player);
-
-                if (rings[i].getStage() == 1)
-                    playerScore += rings[i].getPoints();
-
+                playerScore += rings[i].update(player);
                 rings[i].draw();
             }
         }
@@ -158,10 +156,16 @@ int main()
         // Rings that are in stage 2, ie: now above the player
         window.setView(backgroundView);
 
-        for(size_t i = 0; i < rings.size(); i++) {
+        for(size_t i = 0; i < rings.size(); i++) { // TODO: change to foreach loop instead?
             if (rings[i].getStage() > 1) {
-                rings[i].update(player);
-                rings[i].draw();
+                if (rings[i].getStage() > 2)
+                    cout << "I'm useless, please kill me!" << endl;
+                    // call destructor
+                else
+                {
+                    rings[i].update(player);
+                    rings[i].draw();
+                }
             }
         }
 
@@ -179,6 +183,9 @@ int main()
             window.draw(title);
         }
         else {
+            score.setString(to_string(playerScore));
+            score.setPosition(screenDimensions.x - score.getGlobalBounds().width, 0);
+
             window.draw(score);
         }
 

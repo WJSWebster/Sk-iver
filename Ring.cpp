@@ -16,7 +16,7 @@ extern sf::RenderWindow window;
 
 Ring::Ring() {
     stage = 0;
-    points = 0;
+    points = 0; // TODO remove points variable and usages
 
     srand((unsigned int)time(NULL)); // makes true random (using seed based on curr time)
 
@@ -47,10 +47,12 @@ void Ring::incrementStage() {
     stage = stage + 1;
 }
 
+// TODO: Remove getPoints function and all other references to points var in this class
 int Ring::getPoints() {
     return points;
 }
 
+// TODO: Remove incPoints function and " "
 int Ring::incPoints(int pointInc = 1) {
     points += pointInc;
 }
@@ -91,7 +93,6 @@ void Ring::setCurrSize(float currSize) {
 }
 
 void Ring::resetOrigin() {
-    // circle.setOrigin(
     circle.setOrigin(circle.getRadius(), circle.getRadius());
 }
 
@@ -117,8 +118,9 @@ void Ring::playMissSound() {
     missSound.play();
 }
 
-void Ring::update(Diver player){
+int Ring::update(Diver player){
     float tempSize = getCurrSize();
+    int score = 0;
 
     switch(stage) {
         case 0 :
@@ -135,24 +137,18 @@ void Ring::update(Diver player){
             break;
 
         case 1 : // when the ring is in the stage of diving through
-            if ((player.getPosition().x >= circle.getPosition().x) &&
+/*            if ((player.getPosition().x >= circle.getPosition().x) &&
                     (player.getPosition().y >= circle.getPosition().y) &&
                     (player.getPosition().x + player.getSize().x <= circle.getPosition().x + circle.getLocalBounds().width) &&
-                    (player.getPosition().y + player.getSize().y <= circle.getPosition().y + circle.getLocalBounds().height) )
+                    (player.getPosition().y + player.getSize().y <= circle.getPosition().y + circle.getLocalBounds().height) ) { */
+            if (player.sprite.getGlobalBounds().intersects(circle.getGlobalBounds())) // TODO: need to make this collision detection more specific
             {
                 outlineColor = sf::Color::Green;
 
                 loadHitSound();
                 playHitSound();
 
-                incPoints();
-            }
-            else if (player.sprite.getGlobalBounds().intersects(circle.getGlobalBounds()))
-            {
-                outlineColor = sf::Color::Magenta;
-
-                loadHitSound();
-                playHitSound();
+                score++;
             }
             else
             {
@@ -161,16 +157,14 @@ void Ring::update(Diver player){
                 loadMissSound();
                 playMissSound();
             }
-
             incrementStage();
-
             break;
 
         case 2 : // when the ring has flown past the diver
             tempSize += 1.5;
             setCurrSize(tempSize);
 
-            if (outlineColor.b < 252){
+            if (circle.getOutlineColor().b < 252){
                 makeMoreBlue();
             }
 
@@ -185,6 +179,7 @@ void Ring::update(Diver player){
         default:
             break;
     }
+    return score;
 }
 
 void Ring::makeMoreOpaque(){
@@ -199,7 +194,7 @@ void Ring::makeMoreTransparent(){
 }
 
 void Ring::makeMoreBlue(){
-    outlineColor.b += 1;
+    outlineColor.b += 2;
     circle.setOutlineColor(outlineColor);
 }
 
