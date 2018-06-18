@@ -23,13 +23,12 @@ bool HandleEvents(sf::Sound sound) {
 //          time = clock.restart(); // time elapsed since the last frame rendered
 //          cout << time.asSeconds() << endl;
 
-        // TODO should be pushed out to it's own controller function or something
         switch (event.type)
         {
+            // Debug:
             case sf::Event::MouseButtonPressed:
                 if(event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
-                    // Debug:
-                    cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y;
+                    cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y << endl;
                 break;
 
             case sf::Event::GainedFocus:
@@ -49,8 +48,8 @@ bool HandleEvents(sf::Sound sound) {
                 break;
 
             case sf::Event::Closed:
-//                window.close();
-                return true;
+                window.close();
+                return true; // TODO investigate: will this ever be hit?
 
             default: // if other type of pollEvent
                 // if window.pollEvent(event) but none of the event types listed here

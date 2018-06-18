@@ -7,6 +7,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "Diver.h"
+#include "Particle.h"
 
 class Ring
 {
@@ -52,6 +53,14 @@ private:
     float size;
 
     sf::Color outlineColor;
+
+    bool ringHit;
+    Particle particle;
+    vector<Particle> dots;
+    vector<sf::Vertex> specks;
+    vector<Particle> generateDots(int);
+    vector<sf::Vertex> generateSpecks(vector<Particle>);
+
 
     sf::SoundBuffer hitBuffer;
     sf::Sound hitSound;

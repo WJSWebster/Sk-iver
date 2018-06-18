@@ -7,7 +7,7 @@ set(SOURCE_FILES
         main.cpp
         Diver.cpp
         Diver.h
-        README.md ScreenManager.cpp ScreenManager.h Ring.cpp Ring.h HandleEvents.cpp HandleEvents.h Background.cpp Background.h)
+        README.md ScreenManager.cpp ScreenManager.h Ring.cpp Ring.h HandleEvents.cpp HandleEvents.h Background.cpp Background.h Particle.cpp Particle.h)
 
 add_executable(Sk_iver ${SOURCE_FILES})
 

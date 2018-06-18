@@ -9,6 +9,7 @@
 #include <SFML/Audio.hpp>
 #include "Ring.h"
 #include "Diver.h"
+#include "Particle.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ Ring::Ring() {
     stage = 0;
     points = 0; // TODO remove points variable and usages
 
-    srand((unsigned int)time(NULL)); // makes true random (using seed based on curr time)
+    srand((unsigned int)time(nullptr)); // makes true random (using seed based on curr time)
 
     x = (float) ((rand() % (window.getSize().x - 325)) + 162.5); // so they dont upscale to be outside of the screen dimensions
     y = (float) ((rand() % (window.getSize().y - 325)) + 162.5);
@@ -37,6 +38,18 @@ Ring::Ring() {
     circle.setOutlineColor(outlineColor);
     circle.setPointCount(10);
     circle.setOutlineThickness(20);
+
+
+    // Particle Experiment
+    ringHit = false;
+//    particle.acceleration = sf::Vector2f(0.01, 0.01);
+//
+//    // TODO this needs to be moved within a particles
+//    partCircle.setFillColor(sf::Color::Green);
+//    partCircle.setRadius(5);
+//    partCircle.setPointCount(5);
+
+        srand(time(0)); // used for randomly generating the particles in generateDots()
 }
 
 int Ring::getStage() {
@@ -148,9 +161,13 @@ int Ring::update(Diver player){
                 loadHitSound();
                 playHitSound();
 
+                ringHit = true;
+                dots = generateDots(1000);
+                specks = generateSpecks(dots);
+
                 score++;
             }
-            else
+            else // if player does not intersect with the ring
             {
                 outlineColor = sf::Color::Red;
 
@@ -174,16 +191,40 @@ int Ring::update(Diver player){
             else
                 incrementStage();
 
+            // Particle Experiment
+            if (ringHit) // if the player went through the ring (rather than missing it)
+            {
+
+//                particle.update();
+//                partCircle.setPosition(particle.position); // this should be moved within particle
+                cout << "ring hit : " << particle.position.x << ", " << particle.position.y << endl;
+
+                for(int i = 0; i < dots.size(); i++)
+                {
+                    dots[i].update();
+                    specks[i].color = outlineColor;
+                    specks[i].position = dots[i].position;
+                }
+            }
+            else
+            {
+                cout << "ring not hit!" << endl;
+            }
+
             break;
 
         default:
+            cout << "ERROR Ring::update: what stage is it now??" << stage << endl;
             break;
     }
+
+
+
     return score;
 }
 
 void Ring::makeMoreOpaque(){
-    outlineColor.a += ceil(0.85); // outlineColor.a is type int
+    outlineColor.a += ceil(0.85); // outlineColor.a is type int - this will always inc by 1
     circle.setOutlineColor(outlineColor);
 }
 
@@ -198,6 +239,55 @@ void Ring::makeMoreBlue(){
     circle.setOutlineColor(outlineColor);
 }
 
+vector<Particle> Ring::generateDots(int num)
+{
+    vector<Particle> parts;
+    float radius, theta, x, y;
+
+    for (int i = 0; i < num; i++)
+    {
+        Particle temp;
+
+        radius = rand() % 1000;
+        radius = static_cast<float>((radius / 1000) + 0.005);
+
+//        theta = rand() % 10000; // 10,000 possible angles that the particles could fly out at
+        theta = rand() % 360;
+
+        x = radius * cos(theta);
+        y = radius * sin(theta);
+
+        temp.velocity = sf::Vector2f(x, y);
+        temp.position = circle.getPosition(); // TODO actually pull from circle.getPosition()
+
+        parts.push_back(temp); // places temp into the vector
+    }
+
+    return parts;
+}
+
+vector<sf::Vertex /*sf::CircleShape*/> Ring::generateSpecks(vector<Particle> dots)
+{
+    vector<sf::Vertex> verts;
+
+    for(int i = 0; i < dots.size(); i++)
+    {
+        sf::Vertex temp;
+        temp.position = dots[i].position;
+        temp.color = outlineColor; // as it should be green by the time this is hit
+//        sf::CircleShape temp;
+//        temp.setPosition(dots[i].position);
+//        temp.setFillColor(outlineColor);
+
+        verts.push_back(temp);
+    }
+
+    return verts;
+}
+
 void Ring::draw(){
     window.draw(circle);
+
+    if (ringHit)
+        window.draw(&specks[0], specks.size(), sf::Points);
 }
