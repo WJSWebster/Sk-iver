@@ -13,6 +13,7 @@ class Ring
 {
 public:
     Ring();
+    ~Ring();
 
     sf::CircleShape circle;
 
@@ -55,11 +56,10 @@ private:
     sf::Color outlineColor;
 
     bool ringHit;
-    Particle particle;
-    vector<Particle> dots;
-    vector<sf::Vertex> specks;
-    vector<Particle> generateDots(int);
-    vector<sf::Vertex> generateSpecks(vector<Particle>);
+    vector<Particle> particles;
+    vector<sf::Vertex> vertices;
+    vector<Particle> generateParticles(int);
+    vector<sf::Vertex> generateVertices(vector<Particle>);
 
 
     sf::SoundBuffer hitBuffer;

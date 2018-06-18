@@ -42,14 +42,12 @@ Ring::Ring() {
 
     // Particle Experiment
     ringHit = false;
-//    particle.acceleration = sf::Vector2f(0.01, 0.01);
-//
-//    // TODO this needs to be moved within a particles
-//    partCircle.setFillColor(sf::Color::Green);
-//    partCircle.setRadius(5);
-//    partCircle.setPointCount(5);
 
-        srand(time(0)); // used for randomly generating the particles in generateDots()
+    srand(time(0)); // used for randomly generating the particles in generateParticles()
+}
+
+Ring::~Ring() {
+    cout << "Destructor called" << endl;
 }
 
 int Ring::getStage() {
@@ -162,8 +160,8 @@ int Ring::update(Diver player){
                 playHitSound();
 
                 ringHit = true;
-                dots = generateDots(1000);
-                specks = generateSpecks(dots);
+                particles = generateParticles(1000);
+                vertices = generateVertices(particles);
 
                 score++;
             }
@@ -194,27 +192,17 @@ int Ring::update(Diver player){
             // Particle Experiment
             if (ringHit) // if the player went through the ring (rather than missing it)
             {
-
-//                particle.update();
-//                partCircle.setPosition(particle.position); // this should be moved within particle
-                cout << "ring hit : " << particle.position.x << ", " << particle.position.y << endl;
-
-                for(int i = 0; i < dots.size(); i++)
+                for(int i = 0; i < particles.size(); i++)
                 {
-                    dots[i].update();
-                    specks[i].color = outlineColor;
-                    specks[i].position = dots[i].position;
+                    particles[i].update();
+                    vertices[i].color = outlineColor;
+                    vertices[i].position = particles[i].position;
                 }
-            }
-            else
-            {
-                cout << "ring not hit!" << endl;
-            }
-
+            } // else ring was not hit - so no particle effect
             break;
 
         default:
-            cout << "ERROR Ring::update: what stage is it now??" << stage << endl;
+            cout << "ERROR Ring::update: what stage is it now?? " << stage << endl;
             break;
     }
 
@@ -239,55 +227,59 @@ void Ring::makeMoreBlue(){
     circle.setOutlineColor(outlineColor);
 }
 
-vector<Particle> Ring::generateDots(int num)
+// Particle Functions:  // TODO this needs to be moved within a particles class of it's own
+vector<Particle> Ring::generateParticles(int num)
 {
-    vector<Particle> parts;
+    vector<Particle> particles;
     float radius, theta, x, y;
 
     for (int i = 0; i < num; i++)
     {
         Particle temp;
 
-        radius = rand() % 1000;
+        // How quickly the particles expand outwards
+        radius = rand() % 3000;
         radius = static_cast<float>((radius / 1000) + 0.005);
 
-//        theta = rand() % 10000; // 10,000 possible angles that the particles could fly out at
+        // the number of possible angles that the particles could fly out at
         theta = rand() % 360;
 
         x = radius * cos(theta);
         y = radius * sin(theta);
 
         temp.velocity = sf::Vector2f(x, y);
-        temp.position = circle.getPosition(); // TODO actually pull from circle.getPosition()
+        temp.position = circle.getPosition();
 
-        parts.push_back(temp); // places temp into the vector
+        particles.push_back(temp); // places temp into the vector
     }
 
-    return parts;
+    return particles;
 }
 
-vector<sf::Vertex /*sf::CircleShape*/> Ring::generateSpecks(vector<Particle> dots)
+// draw a vertex at the position of each particle
+vector<sf::Vertex /*sf::CircleShape*/> Ring::generateVertices(vector<Particle> particles)
 {
-    vector<sf::Vertex> verts;
+    vector<sf::Vertex> vertices;
 
-    for(int i = 0; i < dots.size(); i++)
+    for(int i = 0; i < particles.size(); i++)
     {
         sf::Vertex temp;
-        temp.position = dots[i].position;
-        temp.color = outlineColor; // as it should be green by the time this is hit
+        temp.position = particles[i].position;
+        temp.color = outlineColor;
+        // TODO if a vector of sf::CircleShape's instead of sf::Vertex's
 //        sf::CircleShape temp;
-//        temp.setPosition(dots[i].position);
+//        temp.setPosition(particles[i].position);
 //        temp.setFillColor(outlineColor);
 
-        verts.push_back(temp);
+        vertices.push_back(temp);
     }
 
-    return verts;
+    return vertices;
 }
 
 void Ring::draw(){
     window.draw(circle);
 
-    if (ringHit)
-        window.draw(&specks[0], specks.size(), sf::Points);
+    if (ringHit) // if there are also particles to draw:
+        window.draw(&vertices[0], vertices.size(), sf::Points);
 }

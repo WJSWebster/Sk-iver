@@ -157,18 +157,9 @@ int main()
         window.setView(backgroundView);
 
         for(size_t i = 0; i < rings.size(); i++) { // TODO: change to foreach loop instead?
-            if (rings[i].getStage() > 1) {
-                if (rings[i].getStage() > 2) {
-                    cout << "I'm useless, please kill me!" << endl;
-
-                    // call destructor
-//                    delete &rings[i];
-                }
-                else
-                {
-                    rings[i].update(player);
-                    rings[i].draw();
-                }
+            if (rings[i].getStage() == 2) {
+                rings[i].update(player);
+                rings[i].draw();
             }
         }
 
@@ -179,7 +170,7 @@ int main()
         if (textAlpha > 0) { // means that title is no longer drawn once no longer visible
             if (clock.getElapsedTime().asSeconds() > 5)
             {
-                titleColour.a = textAlpha--; // decrements after assignment - this is fine
+                titleColour.a = static_cast<sf::Uint8>(textAlpha--); // decrements after assignment - this is fine
                 title.setFillColor(titleColour);
             }
 
