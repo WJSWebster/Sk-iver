@@ -158,9 +158,12 @@ int main()
 
         for(size_t i = 0; i < rings.size(); i++) { // TODO: change to foreach loop instead?
             if (rings[i].getStage() > 1) {
-                if (rings[i].getStage() > 2)
+                if (rings[i].getStage() > 2) {
                     cout << "I'm useless, please kill me!" << endl;
+
                     // call destructor
+//                    delete &rings[i];
+                }
                 else
                 {
                     rings[i].update(player);
