@@ -6,8 +6,14 @@
 #define SK_IVER_RING_H
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include <cmath>
+#include <ctime>
+#include <SFML/Audio.hpp>
+#include "Particles.h"
 #include "Diver.h"
-#include "Particle.h"
+
+extern sf::RenderWindow window;
 
 class Ring
 {
@@ -20,20 +26,8 @@ public:
     int getStage();
     void incrementStage();
 
-    float getX() const;
-    void setX(int x);
-
-    float getY() const;
-    void setY(int y);
-
-    double getSize() const;
-    void setSize(float size);
-
     float getCurrSize() const;
     void setCurrSize(float currSize);
-
-    int getPoints();
-    int incPoints(int pointInc);
 
     void loadHitSound();
     void playHitSound();
@@ -45,22 +39,18 @@ public:
     void draw();
 
 private:
-    int stage;
-    int points;
+    int stage = 0;
 
     float x;
     float y;
 
-    float size;
+    float size = 150;
 
-    sf::Color outlineColor;
+    sf::Color outlineColor = sf::Color::Yellow;
 
-    bool ringHit;
-    vector<Particle> particles;
-    vector<sf::Vertex> vertices;
-    vector<Particle> generateParticles(int);
-    vector<sf::Vertex> generateVertices(vector<Particle>);
+    bool ringHit = false;
 
+    Particles particles;
 
     sf::SoundBuffer hitBuffer;
     sf::Sound hitSound;

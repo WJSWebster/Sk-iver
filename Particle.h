@@ -6,25 +6,16 @@
 #define SK_IVER_PARTICLE_H
 
 #include <SFML/Graphics.hpp>
-#include <stdio.h>
+#include <cmath>
+#include <iostream>
 
 
 class Particle {
 public:
     // Variables:
-    sf::Vector2f acceleration;
-    sf::Vector2f velocity;
-    sf::Vector2f position;
+    sf::Vector2f acceleration, velocity, position  = sf::Vector2f(0, 0);
 
     // Functions:
-    // Constructor
-    Particle()
-    {
-        acceleration = sf::Vector2f(0, 0);
-        velocity     = sf::Vector2f(0, 0);
-        position     = sf::Vector2f(0, 0);
-    }
-
     void update();
 
     float distance(float x1, float x2, float y1, float y2);

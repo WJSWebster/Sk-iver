@@ -3,8 +3,6 @@
 //
 
 #include "Particle.h"
-#include <SFML/Graphics.hpp>
-#include <math.h>
 
 void Particle::update()
 {

@@ -2,19 +2,14 @@
 // Created by William Webster on 30/11/2017.
 //
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <iostream>
 #include "HandleEvents.h"
-
-using namespace std;
 
 extern sf::RenderWindow window;
 
-bool HandleEvents(sf::Sound sound) {
+bool HandleEvents(sf::Sound sound, sf::View backgroundView) {
     // poll for events
 
-    sf::Event event;
+    sf::Event event{};
 
     while(window.pollEvent(event))
     {
@@ -28,31 +23,30 @@ bool HandleEvents(sf::Sound sound) {
             // Debug:
             case sf::Event::MouseButtonPressed:
                 if(event.mouseButton.button == sf::Mouse::Left) // if left mouse button is pressed
-                    cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y << endl;
+                    std::cout << "X: " << event.mouseButton.x << ", Y: " << event.mouseButton.y << std::endl;
                 break;
 
             case sf::Event::GainedFocus:
-                cout << "Window Active" << endl;
+                std::cout << "Window Active" << std::endl;
                 sound.play();
                 break;
 
             case sf::Event::LostFocus:
-                cout << "Window NOT Active" << endl;
+                std::cout << "Window NOT Active" << std::endl;
                 sound.pause();
                 // TODO pause the game mechanics
                 break;
 
             case sf::Event::Resized:
                 window.setView(sf::View(sf::FloatRect(0, 0, event.size.width, event.size.height))); // letterboxes to keep same original resolution
-                cout << "New width: " << event.size.width << ", new height: " << event.size.height << endl;
+                std::cout << "New width: " << event.size.width << ", new height: " << event.size.height << std::endl;
                 break;
 
             case sf::Event::Closed:
                 window.close();
-                return true; // TODO investigate: will this ever be hit?
+                return true;
 
             default: // if other type of pollEvent
-                // if window.pollEvent(event) but none of the event types listed here
                 break;
         }
 

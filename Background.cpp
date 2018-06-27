@@ -2,19 +2,11 @@
 // Created by William Webster on 06/12/2017.
 //
 
-#include <SFML/Graphics.hpp>
 #include "Background.h"
-
-using namespace std;
-
-extern sf::RenderWindow window;
 
 Background::Background() {
     setImage("Resources/Images/skydiving_placeholder.jpg");
     setSprite();
-
-    fallVelocity = 0;
-    fallAcceleration = 0.0000002;
 
     windowSize.x = window.getSize().x;
     windowSize.y = window.getSize().y;
@@ -31,12 +23,11 @@ Background::Background() {
     sprite.setPosition(windowSize.x / 2, windowSize.y / 2);
 }
 
-Background::~Background() {
-}
+Background::~Background() = default;
 
-void Background::setImage(string filePath) {
+void Background::setImage(std::string filePath) {
     if (!texture.loadFromFile(filePath))
-        cout << "ERROR: Could not load diver texture from file path." << endl;
+        std::cout << "ERROR: Could not load diver texture from file path." << std::endl;
 }
 
 void Background::setSprite() {
@@ -45,19 +36,10 @@ void Background::setSprite() {
 }
 
 void Background::setRotation(float rotation) {
-//    float newRotation = sprite.getRotation() + rotation;
-
-//    if (newRotation < 0)
-//        newRotation += 360;
-//    else if (newRotation > 360)
-//        newRotation -= 360;
-
-    //sprite.setRotation(newRotation);
     sprite.rotate(rotation);
 }
 
 void Background::update(){
-//    setRotation(1);
     fallVelocity += fallAcceleration;
     sf::Vector2f newScale(sprite.getScale().x + fallVelocity, sprite.getScale().y + fallVelocity);
     sprite.setScale(newScale);
