@@ -9,7 +9,7 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 
-bool HandleEvents(sf::Sound sound, sf::View backgroundView);
+bool HandleEvents(sf::Sound sound, sf::RenderWindow &window);
 
 
 #endif //SK_IVER_HANDLEEVENTS_H

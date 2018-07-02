@@ -4,10 +4,10 @@
 
 #include "Diver.h"
 
-extern sf::RenderWindow window;
+//extern sf::RenderWindow window;
 
 // Constructor & Destructor:
-Diver::Diver() {
+Diver::Diver(sf::Vector2u windowSize) {
     setTexture("Resources/Images/newDiver_spritesheet3.png");
     setSprite();
 
@@ -16,11 +16,13 @@ Diver::Diver() {
 
     sprite.setScale(5, 5); // at this point globalBounds (560) becomes 5 times as much as localBounds (112):
 
-    screenSize.x = window.getSize().x;
-    screenSize.y = window.getSize().y;
+    screenSize.x = windowSize.x;
+    screenSize.y = windowSize.y;
 
-    position.x = (screenSize.x - sprite.getLocalBounds().width) / 2;
-    position.y = (screenSize.y - sprite.getLocalBounds().height) / 2;
+    position.x = (windowSize.x - sprite.getLocalBounds().width) / 2;
+    position.y = (windowSize.y - sprite.getLocalBounds().height) / 2;
+
+    std::cout << "position.x: " << position.x << ", positon.y: " << position.y << std::endl;
 }
 
 Diver::~Diver() {
@@ -123,7 +125,6 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
 
     // now we have our final velocity, update player's position
     position += velocity; // TODO update class
-
     checkOutOfBounds(); // check if player is outside the bounds
 
     // needs to be moved to it's own class VVV
@@ -144,10 +145,11 @@ float Diver::update(sf::Clock clock, float frameCounter, float frameSpeed) {
 
     sprite.setTextureRect(sf::IntRect(source.x * spriteDimensions.x, source.y * spriteDimensions.y, spriteDimensions.x, spriteDimensions.y));
     sprite.setPosition(position);
+    
 
     return frameCounter;
 }
 
-void Diver::draw(){
+void Diver::draw(sf::RenderWindow &window){
     window.draw(sprite);
 }

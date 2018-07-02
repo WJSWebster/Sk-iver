@@ -13,7 +13,8 @@
 class Particle {
 public:
     // Variables:
-    sf::Vector2f acceleration, velocity, position  = sf::Vector2f(0, 0);
+    sf::Vector2f acceleration = sf::Vector2f(0, 0);
+    sf::Vector2f velocity, position;
 
     // Functions:
     void update();

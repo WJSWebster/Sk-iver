@@ -10,14 +10,10 @@ ScreenManager &ScreenManager::getInstance(){
 }
 
 //constructor
-ScreenManager::ScreenManager(){
-
-}
+ScreenManager::ScreenManager() = default;
 
 //destructor
-ScreenManager::~ScreenManager(){
-
-}
+ScreenManager::~ScreenManager() = default;
 
 void ScreenManager::setText(string text){
     this->text = text;

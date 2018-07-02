@@ -8,21 +8,17 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-extern sf::RenderWindow window;
-
 class Background {
 public:
-    Background();
-    ~Background();
+    explicit Background(sf::Vector2u windowSize);
+//    ~Background();
 
     void setRotation(float rotation);
 
     void update();
-    void draw();
+    void draw(sf::RenderWindow &window);
 
 private:
-    sf::Vector2i windowSize;
-
     sf::Texture texture;
     sf::Sprite sprite;
 

@@ -4,8 +4,7 @@
 
 #include "Particles.h"
 
-void Particles::generateParticles(int range, sf::CircleShape ring)
-{
+void Particles::generateParticles(int range, sf::Vector2f ringPos) {
     particles.clear(); // added security incase called multiple times
     float radius, theta, x, y;
 
@@ -24,11 +23,14 @@ void Particles::generateParticles(int range, sf::CircleShape ring)
         y = radius * sin(theta);
 
         temp.velocity = sf::Vector2f(x, y);
-        temp.position = ring.getPosition();
+        temp.position = ringPos;
+        std::cout << "Particles: ringPos.x="<< ringPos.x << ", ringPos.y=" << ringPos.y << std::endl;
 
         particles.push_back(temp); // places temp into the vector
     }
 }
+
+Particles::~Particles() = default;
 
 // draw a vertex at the position of each particle
 void Particles::update(sf::Color ringColour)
@@ -47,9 +49,7 @@ void Particles::update(sf::Color ringColour)
     }
 }
 
-extern sf::RenderWindow window;
-
-void Particles::draw()
+void Particles::draw(sf::RenderWindow &window)
 {
     window.draw(&vertices[0], vertices.size(), sf::Points);
 }

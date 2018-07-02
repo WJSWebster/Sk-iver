@@ -6,24 +6,43 @@
 #define SK_IVER_RING_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <cmath>
 #include <ctime>
-#include <SFML/Audio.hpp>
 #include "Particles.h"
 #include "Diver.h"
-
-extern sf::RenderWindow window;
 
 class Ring
 {
 public:
-    Ring();
+    explicit Ring(sf::Vector2u windowSize);
     ~Ring();
 
     sf::CircleShape circle;
 
     int getStage();
+
+    int update(Diver player);
+    void draw(sf::RenderWindow &window);
+
+private:
+    int stage = 0;
+
+    sf::Vector2f position;
+
+    float size = 150;
+
+    sf::Color outlineColor = sf::Color::Yellow;
+
+    bool ringHit = false;
+
+    Particles particles;
+
+    sf::SoundBuffer hitBuffer, missBuffer;
+    sf::Sound hitSound, missSound;
+
+
     void incrementStage();
 
     float getCurrSize() const;
@@ -35,30 +54,7 @@ public:
     void loadMissSound();
     void playMissSound();
 
-    int update(Diver player);
-    void draw();
-
-private:
-    int stage = 0;
-
-    float x;
-    float y;
-
-    float size = 150;
-
-    sf::Color outlineColor = sf::Color::Yellow;
-
-    bool ringHit = false;
-
-    Particles particles;
-
-    sf::SoundBuffer hitBuffer;
-    sf::Sound hitSound;
-    sf::SoundBuffer missBuffer;
-    sf::Sound missSound;
-
     void makeMoreTransparent();
-
     void makeMoreOpaque();
 
     void makeMoreBlue();

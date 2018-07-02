@@ -14,7 +14,7 @@ class Diver
 {
 public:
     // Constructor & Destructor:
-    Diver();
+    Diver(sf::Vector2u windowSize);
     ~Diver();
 
     // Getters & Setters:
@@ -30,9 +30,9 @@ public:
     void setSprite(); // has no parameters as users Diver.texture, which is already set
     void getInputs();
     float update(sf::Clock clock, float frameCounter, float frameSpeed);
-    void draw();
+    void draw(sf::RenderWindow &window);
 
-private: // should be a singleton?
+private:
     sf::Vector2i screenSize;
 
     sf::Vector2f spriteDimensions;
@@ -42,9 +42,8 @@ private: // should be a singleton?
                                      {"Right", 2},
                                      {"Up", 3} };
     sf::Vector2i source;
-    sf::Vector2f position;
-    sf::Vector2f velocity;
-    float maxSpeed = 4.0f;;
+    sf::Vector2f position, velocity;
+    float maxSpeed = 4.0f;
     float acceleration = 0.5f;
     float deceleration = 0.98f;
 

@@ -4,9 +4,7 @@
 
 #include "HandleEvents.h"
 
-extern sf::RenderWindow window;
-
-bool HandleEvents(sf::Sound sound, sf::View backgroundView) {
+bool HandleEvents(sf::Sound sound, sf::RenderWindow &window) {
     // poll for events
 
     sf::Event event{};
@@ -49,6 +47,8 @@ bool HandleEvents(sf::Sound sound, sf::View backgroundView) {
             default: // if other type of pollEvent
                 break;
         }
+
+        //
 
     }
 

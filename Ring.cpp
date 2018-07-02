@@ -4,23 +4,23 @@
 
 #include "Ring.h"
 
-Ring::Ring() {
+Ring::Ring(sf::Vector2u windowSize) {
 
     srand((unsigned int)time(nullptr)); // makes true random (using seed based on curr time)
 
-    x = (float) (rand() % (window.getSize().x - 325) + 162.5); // so they dont upscale to be outside of the screen dimensions
-    y = (float) (rand() % (window.getSize().y - 325) + 162.5);
-    std::cout << "x: " << x << ", y: " << y << std::endl;
+    position.x = (float) (rand() % (windowSize.x - 325) + 162.5); // so they dont upscale to be outside of the screen dimensions
+    position.y = (float) (rand() % (windowSize.y - 325) + 162.5);
+    std::cout << "New ring's x: " << position.x << ", y: " << position.y << std::endl;
 
     setCurrSize(0); // sets the current radius to 0, and reassigns circle's origin appropriately
-    circle.setPosition(x, y);
+    circle.setPosition(position);
 
     circle.setFillColor(sf::Color::Transparent);
     circle.setOutlineColor(outlineColor);
     circle.setPointCount(10);
     circle.setOutlineThickness(20);
 
-    particles.generateParticles(1000, circle);
+    particles.generateParticles(1000, circle.getPosition());
 }
 
 Ring::~Ring() {
@@ -167,11 +167,11 @@ void Ring::makeMoreBlue(){
     circle.setOutlineColor(outlineColor);
 }
 
-void Ring::draw(){
+void Ring::draw(sf::RenderWindow &window){
     window.draw(circle);
 
     if (ringHit) // if there are also particles to draw:
     {
-        particles.draw();
+        particles.draw(window);
     }
 }
